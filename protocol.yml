@@ -1,0 +1,888 @@
+asyncapi: 2.0.0
+
+info:
+  title: Syntropy Websockets API
+  version: '1.0.0'
+  description: |
+    Syntropy WebSockets API allows to connect with Syntropy controller and get node configuration updates and return required info to controller.
+
+    ### Rules
+
+    - Agent version must be valid semver https://semver.org/.
+    - All messages sent and received via WebSockets are encoded in JSON format
+
+    ### HTTP request headers when connectio to controller websocket.
+      ```
+      {
+        "Authorization": "AGENT_TOKEN",
+        "X-DeviceId": "Unique device ID.",
+        "X-DeviceName": "User friendly human readable device name.",
+        "X-DeviceIp": "Host machine public ip",
+        "X-AgentType": "'Linux' | 'macOS' | 'Windows'",
+        "X-AgentType": "Agent software version. Semantic Versioning (x.x.x)",
+      }
+      ```
+servers:
+  prod:
+    url: controller-prod-platform-agents.syntropystack.com
+    protocol: wss
+    description: |
+      Always stable production server for agents . Authentication token has to be created at https://platform.syntropystack.com
+  devel:
+    url: controller-devel-platform-agents.syntropystack.com
+    protocol: wss
+    description: |
+      Always stable Development server for agents. Authentication token has to be created at https://platform-devel.syntropystack.com
+  sandbox:
+    url: controller-sandbox-platform-agents.syntropystack.com
+    protocol: wss
+    description: |
+      Sometimes Stable Sandbox server for agents. Authentication token has to be created at https://platform-sandbox.syntropystack.com
+
+channels:
+  /:
+    subscribe:
+      description: Receive messages from the controller
+      message:
+        oneOf:
+          - $ref: '#/components/messages/GET_INFO'
+          - $ref: '#/components/messages/CONFIG_INFO'
+          - $ref: '#/components/messages/AUTO_PING'
+          - $ref: '#/components/messages/WG_CONF'
+
+    publish:
+      description: Send messeges to the controller
+      message:
+        oneOf:
+          - $ref: '#/components/messages/GET_INFO'
+          - $ref: '#/components/messages/UPDATE_AGENT_CONFIG'
+          - $ref: '#/components/messages/IFACES_PEERS_BW_DATA'
+          - $ref: '#/components/messages/IFACES_BW_DATA'
+          - $ref: '#/components/messages/IFACES_PEERS_ACTIVE_DATA'
+          - $ref: '#/components/messages/LOGGER'
+          - $ref: '#/components/messages/NETWORK_INFO'
+          - $ref: '#/components/messages/CONTAINER_INFO'
+          - $ref: '#/components/messages/HW_SERVICE_INFO'
+          - $ref: '#/components/messages/KUBERNETES_SERVICE_INFO'
+
+
+components:
+  messages:
+    AUTO_PING:
+      description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
+      payload:
+        $ref: '#/components/schemas/AUTO_PING_REQ'
+      x-response:
+        $ref: '#/components/schemas/AUTO_PING_RES'
+    GET_INFO:
+      summary: Event for getting essential info about endpoint.
+      description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
+      payload:
+        $ref: '#/components/schemas/GET_INFO_REQ'
+      x-response:
+        $ref: '#/components/schemas/GET_INFO_RES'
+    CONFIG_INFO:
+      description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
+      payload:
+        $ref: '#/components/schemas/CONFIG_INFO_REQ'
+      x-response:
+        $ref: '#/components/messages/UPDATE_AGENT_CONFIG'
+    UPDATE_AGENT_CONFIG:
+      summary: UPDATE_AGENT_CONFIG is a response to CONFIG_INFO message
+      description: Platform agents sends this event to controller when it wants to update configuration data, i.e. to change configured interface public key due to unrecoverable loss of data on platform agents side.
+      payload:
+        $ref: '#/components/schemas/UPDATE_AGENT_CONFIG'
+    WG_CONF:
+      description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
+      payload:
+        $ref: '#/components/schemas/WG_CONF'
+    IFACES_PEERS_BW_DATA:
+      description: Platform agent periodically sends wireguard configured interfaces peers bandwith data (bandwith of one particular peer via particular interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
+      payload:
+        $ref: '#/components/schemas/IFACES_PEERS_BW_DATA'
+
+    IFACES_BW_DATA:
+      description: Platform agent periodically sends wireguard configured interfaces bandwith data (entire bandwidth passed via given interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
+      payload:
+        $ref: '#/components/schemas/IFACES_BW_DATA'
+
+    IFACES_PEERS_ACTIVE_DATA:
+      description: Platform agent sends information when current ACTIVE route changes.
+      payload:
+        $ref: '#/components/schemas/IFACES_PEERS_ACTIVE_DATA'
+
+    LOGGER:
+      description: Platform agent sends nicely formatted log data to controller. This data is later redirected to platform agents index for users to consume.
+      payload:
+        $ref: '#/components/schemas/LOGGER'
+
+    NETWORK_INFO:
+      description: This event is triggered when platform agent network changes. Platform agent sends entire list of available services and their metadata.
+      payload:
+        $ref: '#/components/schemas/NETWORK_INFO'
+
+    CONTAINER_INFO:
+      description: This event is triggered when platform agent active docker containers changes. Platform agent sends entire list of available services and their metadata.
+      payload:
+        $ref: '#/components/schemas/CONTAINER_INFO'
+
+    HW_SERVICE_INFO:
+      description: This event is triggered when platform agent host hw network changes. Platform agent sends entire list of available services and their metadata.
+      payload:
+        $ref: '#/components/schemas/HW_SERVICE_INFO'
+
+    KUBERNETES_SERVICE_INFO:
+      description: This event is triggered when services statuses changes in kubernes cluster. Platform agent sends entire list of available services and their metadata.
+      payload:
+        $ref: '#/components/schemas/KUBERNETES_SERVICE_INFO'
+
+    WG_ROUTE_STATUS:
+      description: Platform agent sends information about route addition. Confirms successes and failures.
+      payload:
+        $ref: '#/components/schemas/interface'
+      examples:
+        - payload:
+            connectionID: 8628615390848610000
+            event: systemStatus
+            status: online
+            version: 1.0.0
+
+  schemas:
+    AUTO_PING_REQ:
+      type: object
+      properties:
+        type:
+          type: string
+          const: AUTO_PING
+        data:
+          type: array
+          description: Array of ips.
+          items:
+            type: string
+            description: Array of ip addresses needed to ping.
+      required:
+          - type
+          - data
+    AUTO_PING_RES:
+      type: object
+      properties:
+        type:
+          type: string
+          const: AUTO_PING
+        data:
+          type: array
+          description: Array of ips.
+          items:
+            description: Array of ip addresses needed to ping.
+            type: object
+            properties:
+              ip:
+                type: string
+                description: Ip address in string format.
+              latency_ms:
+                type: integer
+              packet_loss:
+                type: number
+    GET_INFO_REQ:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          const: GET_INFO
+        data:
+          type: object
+    GET_INFO_RES:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          const: GET_INFO
+        data:
+          type: object
+          properties:
+            agent_provider:
+              type: integer
+              description: Agent provider id (https://docs.syntropystack.com/docs/syntropy-agent-variables#syntropy-provider).
+            service_status:
+              type: boolean
+              description: Status whether services are enabled by default or not.
+            agent_tags:
+              type: array
+              description: Array of tags.
+              items:
+                type: string
+                description: Tag in string format.
+            external_ip:
+              type: string
+              description: Agent host public ip.
+            network_info:
+              type: array
+              description: Array of docker network objects.
+              items:
+                description: Docker network object.
+                type: object
+                properties:
+                  agent_network_id:
+                    type: string
+                    description: unique id of docker network.
+                  agent_network_name:
+                    type: string
+                  agent_network_subnets:
+                    type: array
+                    description: Subnets that current network owns.
+                    items:
+                      type: string
+            container_info:
+              $ref: '#/components/schemas/container_info'
+          required:
+            - service_status
+      required:
+        - id
+        - type
+
+    CONFIG_INFO_REQ:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        type:
+          type: string
+          const: CONFIG_INFO
+        data:
+          type: object
+          required:
+            - agent_id
+            - network
+            - vpn
+          properties:
+            agent_id:
+              type: string
+            network:
+              type: object
+              description: Wireguard interfaces.
+              required:
+                - PUBLIC
+                - SDN1
+                - SDN2
+                - SDN3
+              properties:
+                PUBLIC:
+                  $ref: '#/components/schemas/interface'
+                SDN1:
+                  $ref: '#/components/schemas/interface'
+                SDN2:
+                  $ref: '#/components/schemas/interface'
+                SDN3:
+                  $ref: '#/components/schemas/interface'
+            vpn:
+              type: array
+              description: List of agent configuration commands.
+              items:
+                type: object
+                required:
+                  - fn
+                  - args
+                properties:
+                  fn:
+                    type: string
+                    description: Function name to call.
+                  args:
+                    type: object
+                    description: Arguments needed for function to call.
+                  metadata:
+                    type: object
+                    description: Metadata when calling function.
+    UPDATE_AGENT_CONFIG:
+      type: object
+      description: Need to send only if interfaces updated compared to CONFIG_INFO.
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        type:
+          type: string
+          const: UPDATE_AGENT_CONFIG
+        data:
+          type: array
+          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from CONFIG_INFO.
+          items:
+            type: object
+            properties:
+              fn:
+                type: string
+                description: Executed command.
+              data:
+                type: object
+                description: Interface info
+                properties:
+                  ifname:
+                    type: string
+                  public_key:
+                    $ref: '#/components/schemas/public_key'
+                  listen_port:
+                    $ref: '#/components/schemas/listen_port'
+                  internal_ip:
+                    $ref: '#/components/schemas/internal_ip'
+    WG_CONF:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        type:
+          type: string
+          const: WG_CONF
+        data:
+          type: array
+          description: List of wireguard configration commands
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/create_interface'
+              - $ref: '#/components/schemas/remove_interface'
+              - $ref: '#/components/schemas/add_peer'
+              - $ref: '#/components/schemas/remove_peer'
+
+
+    IFACES_BW_DATA:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: IFACES_BW_DATA
+        data:
+          type: array
+          description: List of interfaces with BW data
+          items:
+            type: object
+            properties:
+              iface:
+                type: string
+              rx_speed_mbps:
+                $ref: '#/components/schemas/rx_speed_mbps'
+              tx_speed_mbps:
+                $ref: '#/components/schemas/tx_speed_mbps'
+              tx_dropped:
+                type: integer
+              rx_dropped:
+                type: integer
+              tx_errors:
+                type: integer
+              rx_errors:
+                type: integer
+              tx_packets:
+                type: integer
+              rx_packets:
+                type: integer
+              interval:
+                type: integer
+
+    IFACES_PEERS_BW_DATA:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: IFACES_PEERS_BW_DATA
+        data:
+          type: array
+          description: List of interfaces with analytic peers data.
+          items:
+            type: object
+            required:
+              - iface
+              - iface_public_key
+            properties:
+              iface:
+                type: string
+              iface_public_key:
+                type: string
+              peers:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - public_key
+                    - internal_ip
+                    - allowed_ips
+                    - latency_ms
+                    - packet_loss
+                    - status
+                    - last_handshake
+                    - keep_alive_interval
+                  properties:
+                    public_key:
+                      $ref: '#/components/schemas/public_key'
+                    allowed_ips:
+                      $ref: '#/components/schemas/allowed_ips'
+                    internal_ip:
+                      $ref: '#/components/schemas/internal_ip'
+                    latency_ms:
+                      $ref: '#/components/schemas/latency_ms'
+                    packet_loss:
+                      $ref: '#/components/schemas/packet_loss'
+                    status:
+                      $ref: '#/components/schemas/peer_status'
+                    rx_bytes:
+                      $ref: '#/components/schemas/rx_bytes'
+                    tx_bytes:
+                      $ref: '#/components/schemas/tx_bytes'
+                    tx_speed_mbps:
+                      $ref: '#/components/schemas/tx_speed_mbps'
+                    rx_speed_mbps:
+                      $ref: '#/components/schemas/rx_speed_mbps'
+                    connection_id:
+                      $ref: '#/components/schemas/connection_id'
+                    last_handshake:
+                      type: string
+                    keep_alive_interval:
+                      type: integer
+
+
+    IFACES_PEERS_ACTIVE_DATA:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: IFACES_PEERS_ACTIVE_DATA
+        data:
+          type: array
+          description: List of peers connections that became active after rerouting event.
+          items:
+            type: object
+            required:
+              - connection_id
+              - timestamp
+            properties:
+              connection_id:
+                $ref: '#/components/schemas/connection_id'
+              timestamp:
+                type: string
+
+
+    LOGGER:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: LOGGER
+        data:
+          type: object
+          required:
+            - severity
+            - message
+          properties:
+            severity:
+              type: string
+            message:
+              type: string
+
+
+    NETWORK_INFO:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: NETWORK_INFO
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - docker_network_id
+              - docker_network_name
+              - docker_network_subnets
+            properties:
+              docker_network_id:
+                type: string
+              docker_network_name:
+                type: string
+              docker_network_subnets:
+                $ref: '#/components/schemas/subnets'
+
+    CONTAINER_INFO:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: CONTAINER_INFO
+        data:
+          type: object
+          required:
+            - container_info
+          properties:
+            container_info:
+              $ref: '#/components/schemas/container_info'
+
+    HW_SERVICE_INFO:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: HW_SERVICE_INFO
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - agent_network_subnets
+              - agent_network_iface
+              - agent_network_ports
+            properties:
+              agent_network_subnets:
+                $ref: '#/components/schemas/subnets'
+              agent_network_iface:
+                type: string
+              agent_network_ports:
+                $ref: '#/components/schemas/service_ports'
+
+    KUBERNETES_SERVICE_INFO:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: KUBERNETES_SERVICE_INFO
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - agent_service_subnets
+              - agent_service_name
+              - agent_service_ports
+            properties:
+              agent_service_subnets:
+                $ref: '#/components/schemas/subnets'
+              agent_service_name:
+                type: string
+              agent_service_ports:
+                $ref: '#/components/schemas/service_ports'
+
+    create_interface:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: create_interface
+        args:
+          $ref: '#/components/schemas/interface'
+        metadata:
+          $ref: '#/components/schemas/interface_metadata'
+      description: Wireguard interface creation.
+
+    remove_interface:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: remove_interface
+        args:
+          type: object
+          required:
+            - ifname
+          properties:
+            ifname:
+              type: string
+      description: Wireguard interface remove.
+
+    add_peer:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: add_peer
+        args:
+          $ref: '#/components/schemas/peer'
+        metadata:
+          $ref: '#/components/schemas/peer_metadata'
+      description: Wireguard interface remove.
+
+    remove_peer:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: remove_peer
+        args:
+          type: object
+          required:
+            - ifname
+          properties:
+            ifname:
+              type: string
+            public_key:
+              $ref: '#/components/schemas/public_key'
+            allowed_ips:
+              $ref: '#/components/schemas/allowed_ips'
+      description: Wireguard interface remove.
+
+
+    interface:
+      type: object
+      required:
+        - internal_ip
+        - public_key
+      properties:
+        internal_ip:
+          $ref: '#/components/schemas/internal_ip'
+        public_key:
+          $ref: '#/components/schemas/public_key'
+        listen_port:
+          $ref: '#/components/schemas/listen_port'
+      description: Wireguard interface info.
+
+    peer:
+      type: object
+      required:
+        - ifname
+        - public_key
+        - allowed_ips
+        - gw_ipv4
+      properties:
+        ifname:
+          type: string
+        public_key:
+          $ref: '#/components/schemas/public_key'
+        allowed_ips:
+          $ref: '#/components/schemas/allowed_ips'
+        gw_ipv4:
+          type: string
+        endpoint_ipv4:
+          type: string
+        endpoint_port:
+          type: string
+      description: Peer fields.
+
+    interface_metadata:
+      type: object
+      properties:
+        connection_id:
+          type: string
+      description: Interface Metadata
+
+    peer_metadata:
+      type: object
+      properties:
+        device_id:
+          type: string
+        device_name:
+          type: string
+        device_public_ipv4:
+          type: string
+        connection_id:
+          type: string
+        connection_group_id:
+          type: string
+        allowed_ips_info:
+          type: array
+          items:
+            type: object
+            properties:
+              agent_service_name:
+                type: string
+              agent_service_subnet_ip:
+                type: string
+              agent_service_tcp_ports:
+                $ref: '#/components/schemas/tcp_ports'
+              agent_service_udp_ports:
+                $ref: '#/components/schemas/udp_ports'
+      description: Peer Metadata
+
+    container_info:
+      type: array
+      description: Array of docker network objects.
+      items:
+        description: Docker network object.
+        type: object
+        required:
+          - agent_container_id
+          - agent_container_name
+          - agent_container_state
+          - agent_container_networks
+          - agent_container_ips
+        properties:
+          agent_container_id:
+            type: string
+            description: Unique id of docker container.
+          agent_container_name:
+            type: string
+          agent_container_state:
+            type: string
+            description: Container state.
+            enum:
+              - running
+              - stopped
+          agent_container_uptime:
+            type: string
+            description: Container uptime.
+          agent_container_networks:
+            type: array
+            description: Networks that container belongs to.
+            items:
+              type: string
+          agent_container_ips:
+            type: array
+            description: Container ips.
+            items:
+              type: string
+          agent_container_ports:
+            $ref: '#/components/schemas/service_ports'
+
+    service_ports:
+      type: object
+      description: Container ips.
+      properties:
+        udp:
+          $ref: '#/components/schemas/udp_ports'
+        tcp:
+          $ref: '#/components/schemas/tcp_ports'
+
+
+    udp_ports:
+      type: array
+      description: List of udp ports used by container.
+      items:
+        type: integer
+
+    tcp_ports:
+      type: array
+      description: List of tcp ports used by container.
+      items:
+        type: integer
+
+    msg_id:
+      type: string
+      description: Unique ID of message. (response need to be send with identical id)
+
+    public_key:
+      type: string
+
+    internal_ip:
+      type: string
+
+    latency_ms:
+      type: string
+
+    packet_loss:
+      type: number
+
+    peer_status:
+      type: string
+      enum:
+        - CONNECTED
+        - WARNING
+        - OFFLINE
+
+    allowed_ips:
+      type: array
+      description: List of ips.
+      items:
+        type: string
+
+    listen_port:
+      type: integer
+      description: Interface listening port.
+
+    rx_bytes:
+      type: integer
+
+    tx_bytes:
+      type: integer
+
+    tx_speed_mbps:
+      type: number
+
+    rx_speed_mbps:
+      type: number
+
+    connection_id:
+      type: integer
+
+    subnets:
+      type: array
+      items:
+        type: string
