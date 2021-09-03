@@ -6,12 +6,12 @@ info:
   description: |
     Syntropy WebSockets API allows to connect with Syntropy controller and get node configuration updates and return required info to controller.
 
-    ### Rules
+    ### General Rules
 
     - Agent version must be valid semver https://semver.org/.
     - All messages sent and received via WebSockets are encoded in JSON format
 
-    ### HTTP request headers when connectio to controller websocket.
+    ### HTTP request headers when connecting to controller websocket.
       ```
       {
         "Authorization": "AGENT_TOKEN",
@@ -139,7 +139,7 @@ components:
     WG_ROUTE_STATUS:
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
-        $ref: '#/components/schemas/interface'
+        $ref: '#/components/schemas/wg_route_status'
       examples:
         - payload:
             connectionID: 8628615390848610000
@@ -159,7 +159,7 @@ components:
           description: Array of ips.
           items:
             type: string
-            description: Array of ip addresses needed to ping.
+            description: Array of ip addresses agent should ping.
       required:
           - type
           - data
@@ -173,7 +173,7 @@ components:
           type: array
           description: Array of ips.
           items:
-            description: Array of ip addresses needed to ping.
+            description: Array of ip addresses should ping.
             type: object
             properties:
               ip:
@@ -299,7 +299,7 @@ components:
                     description: Function name to call.
                   args:
                     type: object
-                    description: Arguments needed for function to call.
+                    description: Arguments required for function to call.
                   metadata:
                     type: object
                     description: Metadata when calling function.
@@ -741,7 +741,7 @@ components:
       type: object
       properties:
         connection_id:
-          type: string
+          $ref: '#/components/schemas/connection_id'
       description: Interface Metadata
 
     peer_metadata:
@@ -754,9 +754,9 @@ components:
         device_public_ipv4:
           type: string
         connection_id:
-          type: string
+          $ref: '#/components/schemas/connection_id'
         connection_group_id:
-          type: string
+          $ref: '#/components/schemas/connection_group_id'
         allowed_ips_info:
           type: array
           items:
@@ -812,6 +812,33 @@ components:
           agent_container_ports:
             $ref: '#/components/schemas/service_ports'
 
+    wg_route_status:
+      type: object
+      description: Status after adding route to host routing table.
+      properties:
+        connection_id:
+          $ref: '#/components/schemas/connection_id'
+        connection_group_id:
+          $ref: '#/components/schemas/connection_id'
+        statuses:
+          $ref: '#/components/schemas/route_statuses'
+
+    route_statuses:
+      type: array
+      description: List of ips.
+      items:
+        type: object
+        required:
+          - status
+          - ip
+        properties:
+          status:
+            $ref: '#/components/schemas/route_status'
+          ip:
+            type: string
+          msg:
+            type: string
+
     service_ports:
       type: object
       description: Container ips.
@@ -836,7 +863,7 @@ components:
 
     msg_id:
       type: string
-      description: Unique ID of message. (response need to be send with identical id)
+      description: Unique ID of message. (response should be sent with same id as request)
 
     public_key:
       type: string
@@ -856,6 +883,12 @@ components:
         - CONNECTED
         - WARNING
         - OFFLINE
+
+    route_status:
+      type: string
+      enum:
+        - ERROR
+        - OK
 
     allowed_ips:
       type: array
@@ -880,6 +913,9 @@ components:
       type: number
 
     connection_id:
+      type: integer
+
+    connection_group_id:
       type: integer
 
     subnets:
