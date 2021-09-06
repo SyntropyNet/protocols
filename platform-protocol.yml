@@ -19,7 +19,7 @@ info:
         "X-DeviceName": "User friendly human readable device name.",
         "X-DeviceIp": "Host machine public ip",
         "X-AgentType": "'Linux' | 'macOS' | 'Windows'",
-        "X-AgentType": "Agent software version. Semantic Versioning (x.x.x)",
+        "X-AgentVersion": "Agent software version. Semantic Versioning (x.x.x)",
       }
       ```
 servers:

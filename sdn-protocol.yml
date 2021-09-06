@@ -1,0 +1,276 @@
+asyncapi: 2.0.0
+
+info:
+  title: Syntropy Websockets API
+  version: '1.0.0'
+  description: |
+    Syntropy SGN WebSockets API allows to connect with Syntropy controller and get SDN node configuration updates and return required info to controller.
+
+    ### General Rules
+
+    - Agent version must be valid semver https://semver.org/.
+    - All messages sent and received via WebSockets are encoded in JSON format
+
+    ### HTTP request headers when connecting to controller websocket.
+      ```
+      {
+        "X-Ipv4-Nat11": "Server main interface ip.",
+        "X-DeviceName": "User friendly human readable device name.",
+        "X-DeviceIp": "Host machine public ip",
+        "x-AgentVersion": "Agent software version. Semantic Versioning (x.x.x)",
+        "x-KernelVersion": "Host kernel version. Semantic Versioning (x.x.x)",
+      }
+
+      ```
+    #### On Connect to retrieve latest configuration info agent should fetch it from https://controller-sandbox-server.syntropystack.com/api/agents/auth_key/config?ip=AGENT_PUBLIC_IP
+
+servers:
+  prod:
+    url: controller-prod-agents.syntropystack.com?auth_key=auth_key
+    protocol: wss
+    description: |
+      Always stable production server for agents.
+  devel:
+    url: controller-devel-agents.syntropystack.com?auth_key=auth_key
+    protocol: wss
+    description: |
+      Always stable Development server for agents.
+  sandbox:
+    url: controller-sandbox-agents.syntropystack.com?auth_key=auth_key
+    protocol: wss
+    description: |
+      Sometimes Stable Sandbox server for agents.
+
+channels:
+  /:
+    subscribe:
+      description: Receive messages from the controller
+      message:
+        oneOf:
+          - $ref: '#/components/messages/AUTO_PING'
+          - $ref: '#/components/messages/NFTABLES'
+
+    publish:
+      description: Send messeges to the controller
+      message:
+        oneOf:
+          - $ref: '#/components/messages/LOGGER'
+
+
+components:
+  messages:
+    AUTO_PING:
+      description: Controller sets list of hosts for sdn agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
+      payload:
+        $ref: '#/components/schemas/AUTO_PING_REQ'
+      x-response:
+        $ref: '#/components/schemas/AUTO_PING_RES'
+
+    NFTABLES:
+      description: Controller sends sdn agent configuration settings.
+      payload:
+        $ref: '#/components/schemas/NFTABLES'
+
+    LOGGER:
+      description: SDN agent sends nicely formatted log data to controller. This data is later redirected to sdn agents index for users to consume.
+      payload:
+        $ref: '#/components/schemas/LOGGER'
+
+
+  schemas:
+    AUTO_PING_REQ:
+      type: object
+      properties:
+        type:
+          type: string
+          const: AUTO_PING
+        data:
+          type: array
+          description: Array of ips.
+          items:
+            type: string
+            description: Array of ip addresses agent should ping.
+      required:
+          - type
+          - data
+    AUTO_PING_RES:
+      type: object
+      properties:
+        type:
+          type: string
+          const: AUTO_PING
+        data:
+          type: array
+          description: Array of ips.
+          items:
+            description: Array of ip addresses should ping.
+            type: object
+            properties:
+              ip:
+                type: string
+                description: Ip address in string format.
+              latency_ms:
+                type: integer
+              packet_loss:
+                type: number
+    NFTABLES:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        type:
+          type: string
+          const: NFTABLES
+        data:
+          type: array
+          description: Configure NFTABLES / EBPF
+          items:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/unat4_table_add'
+              - $ref: '#/components/schemas/unat4_table_add'
+              - $ref: '#/components/schemas/unat4_table_del'
+              - $ref: '#/components/schemas/unat4_mapping_clear'
+              - $ref: '#/components/schemas/unat4_mapping_get'
+
+    LOGGER:
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: LOGGER
+        data:
+          type: object
+          required:
+            - severity
+            - message
+          properties:
+            severity:
+              type: string
+            message:
+              type: string
+
+    unat4_table_add:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: unat4_table_add
+        args:
+          type: object
+          required:
+            - addr
+          properties:
+            addr:
+              $ref: '#/components/schemas/ip_addr'
+      description: Unat4 table creation.
+
+    unat4_table_del:
+      type: object
+      proprties:
+        fn:
+          type: string
+          const: unat4_table_del
+        args:
+          type: object
+
+    unat4_mapping_clear:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: unat4_mapping_clear
+        args:
+          type: object
+          required:
+            - addr
+            - port
+          properties:
+            addr:
+              $ref: '#/components/schemas/ip_addr'
+            port:
+              $ref: '#/components/schemas/port'
+      description: Delete mapping
+
+    unat4_mapping_get:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: unat4_mapping_get
+        args:
+          type: object
+          required:
+            - addr
+            - port
+          properties:
+            addr:
+              $ref: '#/components/schemas/ip_addr'
+            port:
+              $ref: '#/components/schemas/port'
+      description: Get mapping info
+
+    unat4_mapping_set:
+      type: object
+      required:
+        - fn
+        - args
+      properties:
+        fn:
+          type: string
+          const: unat4_table_set
+        args:
+          type: object
+          required:
+            - addr
+            - port
+          properties:
+            addr:
+              $ref: '#/components/schemas/ip_addr'
+            port:
+              $ref: '#/components/schemas/port'
+            endpoints:
+              $ref: '#/components/schemas/endpoints'
+      description: Unat4 mapping set.
+
+    endpoints:
+      type: object
+      required:
+        - addr
+        - port
+      properties:
+        addr:
+          $ref: '#/components/schemas/ip_addr'
+        port:
+          $ref: '#/components/schemas/port'
+
+
+    msg_id:
+      type: string
+      description: Unique ID of message. (response should be sent with same id as request)
+
+    ip_addr:
+      type: string
+
+    port:
+      type: number
