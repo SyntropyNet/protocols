@@ -297,12 +297,11 @@ components:
                   fn:
                     type: string
                     description: Function name to call.
+                    const: add_peer
                   args:
-                    type: object
-                    description: Arguments required for function to call.
+                    $ref: '#/components/schemas/peer'
                   metadata:
-                    type: object
-                    description: Metadata when calling function.
+                    $ref: '#/components/schemas/peer_metadata'
     UPDATE_AGENT_CONFIG:
       type: object
       description: Need to send only if interfaces updated compared to CONFIG_INFO.
