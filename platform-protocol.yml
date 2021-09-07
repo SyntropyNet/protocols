@@ -434,7 +434,6 @@ components:
                   required:
                     - public_key
                     - internal_ip
-                    - allowed_ips
                     - latency_ms
                     - packet_loss
                     - status
@@ -676,7 +675,7 @@ components:
           $ref: '#/components/schemas/peer'
         metadata:
           $ref: '#/components/schemas/peer_metadata'
-      description: Wireguard interface remove.
+      description: Wireguard add peer.
 
     remove_peer:
       type: object
@@ -698,7 +697,7 @@ components:
               $ref: '#/components/schemas/public_key'
             allowed_ips:
               $ref: '#/components/schemas/allowed_ips'
-      description: Wireguard interface remove.
+      description: Wireguard peer remove.
 
 
     interface:
