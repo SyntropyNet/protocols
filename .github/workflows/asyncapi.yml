@@ -5,18 +5,51 @@ on:
     branches: [ main ]
 
 jobs:
-  generate:
+  create-container:
     runs-on: ubuntu-latest
     steps:
-    #"standard step" where repo needs to be checked-out first
-    - name: Checkout repo
-      uses: actions/checkout@v2
-
-    #In case you do not want to use defaults, you for example want to use different template
-    - name: Generating HTML from my AsyncAPI document
-      uses: asyncapi/github-action-for-generator@v1
-      with:
-        template: '@asyncapi/html-template@0.9.0'  #In case of template from npm, because of @ it must be in quotes
-        filepath: platform-protocol.yml
-        parameters: baseHref=/test-experiment/ sidebarOrganization=byTags #space separated list of key/values
-        output: generated-html
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASS }}
+      -
+        name: test
+        run: echo running on branch ${GITHUB_REF}
+      -
+        name: SANDBOX Build and push
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            syntropynet/protocols:sandbox
+          platforms: linux/amd64
+      -
+        name: DEVEL Build and push
+        if: contains(github.ref, 'refs/tags/')
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: syntropynet/protocols:devel
+      -
+        name: PROD Build and push
+        # BRANCH_STABLE_VERSION
+        if: github.ref == 'refs/heads/v0.1.0'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            syntropynet/protocols:prod

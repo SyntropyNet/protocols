@@ -74,6 +74,26 @@ components:
         $ref: '#/components/schemas/AUTO_PING_REQ'
       x-response:
         $ref: '#/components/schemas/AUTO_PING_RES'
+      examples:
+        - payload:
+            id: nEsBfD773UlafZnf
+            type: AUTO_PING
+            data:
+              ips:
+                - 23.95.220.138
+                - 94.237.29.266
+                - 173.104.147.220
+              interval: 60
+              response_limit: 5
+        - payload:
+            id: nEsBfD773UlafZ12
+            type: AUTO_PING
+            data:
+              hosts:
+                -
+              interval: 60
+              response_limit: 5
+
     GET_INFO:
       summary: Event for getting essential info about endpoint.
       description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
@@ -81,25 +101,225 @@ components:
         $ref: '#/components/schemas/GET_INFO_REQ'
       x-response:
         $ref: '#/components/schemas/GET_INFO_RES'
+      examples:
+        - payload:
+            id: nEsBfD773UlafZ12
+            type: GET_INFO
+            data: {}
+
     CONFIG_INFO:
       description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
       payload:
         $ref: '#/components/schemas/CONFIG_INFO_REQ'
       x-response:
         $ref: '#/components/messages/UPDATE_AGENT_CONFIG'
+      examples:
+        - payload:
+            id: Asa05ML1102HSJVl
+            type: CONFIG_INFO
+            data:
+              agent_id: 1664
+              network:
+                SDN1:
+                  internal_ip: 10.69.0.146
+                  public_key: RzaBT6fXJime+KEFJKkWrozumOEDPpZhJaHWPZmerAA=
+                  listen_port: 35524
+                SDN2:
+                  internal_ip: 10.69.0.147
+                  public_key: oIGZCz9Dazl1caNczHkn82jVcIWQxfk7a3kEoVRT7Hc=
+                  listen_port: 60556
+                SDN3:
+                  internal_ip: 10.69.0.49
+                  public_key: nfZTRcI+odCeApDKwSklqSWlh5ypABn77XbS/I452Sw=
+                  listen_port: 49975
+                PUBLIC:
+                  internal_ip: 10.69.0.47
+                  public_key: nctTdgN8znYkyUvfeUmaPv7DxmTd3rfo+usC6dImaRQ=
+                  listen_port: 59753
+              vpn:
+                -
+                  fn: add_peer
+                  args:
+                    allowed_ips:
+                      - 10.69.10.93/32
+                    endpoint_ipv4: 94.251.23.158
+                    endpoint_port: 0
+                    ifname: SYNTROPY_PUBLIC
+                    public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
+                    gw_ipv4: 10.69.0.47
+                  metadata:
+                    device_id: 292:00329-10280-00000-AA017
+                    device_name: Example
+                    device_public_ipv4: 94.251.23.158
+                    connection_id: 1025617
+                    connection_group_id: 75582
+                    agent_id: 6172
+                    link_tag: PUBLIC
+                    allowed_ips_info:
+                      agent_service_name: service_Name
+                      agent_service_tcp_ports:
+                        - 45444
+                      agent_service_udp_ports:
+                      agent_service_subnet_ip: 172.20.0.0/26
+
     UPDATE_AGENT_CONFIG:
       summary: UPDATE_AGENT_CONFIG is a response to CONFIG_INFO message
       description: Platform agents sends this event to controller when it wants to update configuration data, i.e. to change configured interface public key due to unrecoverable loss of data on platform agents side.
       payload:
         $ref: '#/components/schemas/UPDATE_AGENT_CONFIG'
+      examples:
+        - payload:
+            id: 0OEqrxBRyAExh04b
+            executed_at: "2021-08-04T11:18:38.319935"
+            type: UPDATE_AGENT_CONFIG
+            data:
+              -
+                fn: create_interface
+                data:
+                  public_key: O39YgbELLp80K2G5D/xZjcM0gZcRURW1LCWNc5FaO3I=
+                  listen_port: 49152
+                  ifname: SYNTROPY_PUBLIC
+                  internal_ip: 10.69.14.97
+              -
+                fn: create_interface
+                data:
+                  public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
+                  listen_port: 49156
+                  ifname: SYNTROPY_SDN1
+                  internal_ip: 10.69.14.98
+              -
+                fn: create_interface
+                data:
+                  public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
+                  listen_port: 49153
+                  ifname: SYNTROPY_SDN2
+                  internal_ip: 10.69.14.99
+              -
+                fn: create_interface
+                data:
+                  public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
+                  listen_port: 49154
+                  ifname: SYNTROPY_SDN3
+                  internal_ip: 10.69.14.100
     WG_CONF:
       description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
       payload:
         $ref: '#/components/schemas/WG_CONF'
+      examples:
+        - payload:
+            id: Asa05ML1102HSJVl
+            type: WG_CONF
+            data:
+              -
+                fn: add_peer
+                args:
+                  allowed_ips:
+                    - 10.69.10.93/32
+                  endpoint_ipv4: 94.251.23.158
+                  endpoint_port: 0
+                  ifname: SYNTROPY_PUBLIC
+                  public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
+                  gw_ipv4: 10.69.0.47
+                metadata:
+                  device_id: 292:00329-10280-00000-AA017
+                  device_name: Example
+                  device_public_ipv4: 94.251.23.158
+                  connection_id: 1025617
+                  connection_group_id: 75582
+                  agent_id: 6172
+                  link_tag: PUBLIC
+                  allowed_ips_info:
+                    agent_service_name: service_Name
+                    agent_service_tcp_ports:
+                      - 45444
+                    agent_service_udp_ports:
+                    agent_service_subnet_ip: 172.20.0.0/26
+        - payload:
+            id: Asa05ML1102HSJVl
+            type: WG_CONF
+            data:
+              -
+                fn: remove_peer
+                args:
+                  ifname: SYNTROPY_PUBLIC
+                  public_key: KaCq7nTViC9rhPc21ky92H7iTldGF76m3hrcSR4UdUc=
+                  allowed_ips:
+                    - 10.69.10.86/32
+              -
+                fn: remove_peer
+                ifname: SYNTROPY_SDN1
+                public_key: AxB/JKQ9aPRgfEA5zI00jX4aZzfxz8LwTKrYaN0OkjI=
+                allowed_ips:
+                 - 10.69.10.86/32
+
     IFACES_PEERS_BW_DATA:
       description: Platform agent periodically sends wireguard configured interfaces peers bandwith data (bandwith of one particular peer via particular interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
       payload:
         $ref: '#/components/schemas/IFACES_PEERS_BW_DATA'
+      examples:
+        - payload:
+            id: "-"
+            executed_at: "2021-09-08T12:22:01.248033"
+            type: IFACES_PEERS_BW_DATA
+            data:
+              - iface: SYNTROPY_PUBLIC
+                iface_public_key: nctTdgN8znYkyUvfeUmaPv7DxmTd3rfo+usC6dImaRQ=
+                peers:
+                  - ifname: SYNTROPY_PUBLIC
+                    public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
+                    allowed_ips:
+                      - 10.69.10.93/32
+                    last_handshake: '2021-09-08T03:35:52'
+                    keep_alive_interval: 15
+                    rx_bytes: 308
+                    tx_bytes: 888380
+                    timestamp: 1631103713.179484
+                    internal_ip: 10.69.10.93
+                    latency_ms:
+                    packet_loss: 1
+                    rx_speed_mbps: 0
+                    tx_speed_mbps: -2.2794318546905317e-05
+                    status: OFFLINE
+                    status_reason: Packet loss 100%
+              - iface: SYNTROPY_SDN1
+                iface_public_key: gwEcTlpb1G5lZbITi12TketrWs8i3mcpImQ3FE0+fxU=
+                peers:
+                  - ifname: SYNTROPY_SDN1
+                    public_key: tkjx2fMmLqnK2f/iSquNZdBKOObeyC2+kSWCCHBXcxk=
+                    allowed_ips:
+                    - 10.69.5.158/32
+                    last_handshake: '2021-08-18T07:19:24'
+                    keep_alive_interval: 15
+                    rx_bytes: 372556
+                    tx_bytes: 417812
+                    timestamp: 1629271224.722649
+                    internal_ip: 10.69.5.158
+                    status: CONNECTED
+                    latency_ms: 188.1084442138672
+                    packet_loss: 0
+                    rx_speed_mbps: 0.00015519337514969392
+                    tx_speed_mbps: -0.00015466370492734
+              - iface: SYNTROPY_SDN2
+                iface_public_key: Vb6584v7UAwT1T0XLwg/hd/OzvDWh0/47zNkCQERmDo=
+                peers:
+                  - ifname: SYNTROPY_SDN2
+                    public_key: sfWquyQ/BDva7BWPegKHDC4HUhy+VcEfRTA6mX8fAyg=
+                    allowed_ips:
+                    - 10.69.5.159/32
+                    last_handshake: '2021-08-18T07:19:24'
+                    keep_alive_interval: 15
+                    rx_bytes: 372556
+                    tx_bytes: 417516
+                    timestamp: 1629271224.728945
+                    internal_ip: 10.69.5.159
+                    status: CONNECTED
+                    latency_ms: 185.84465980529785
+                    packet_loss: 0
+                    rx_speed_mbps: 0.00015976386728270547
+                    tx_speed_mbps: -0.00015618854658926737
+              - iface: SYNTROPY_SDN3
+                iface_public_key: oIGZCz9Dazl1caNczHkn82jVcIWQxfk7a3kEoVRT7Hc=
+                peers: [ ]
 
     IFACES_BW_DATA:
       description: Platform agent periodically sends wireguard configured interfaces bandwith data (entire bandwidth passed via given interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
@@ -197,6 +417,29 @@ components:
         data:
           type: object
     GET_INFO_RES:
+      examples:
+        payload:
+          id: sQG1X9hDvDUSaRxr
+          executed_at: '2021-08-11T08:20:47.001255'
+          type: GET_INFO
+          data:
+            external_ip: 176.207.214.111
+            network_info:
+              - agent_network_id: 3ab26b40fd934f1bb3f9007b1047774feaf2473737f63eb7125eee3e8ac0e64a
+                agent_network_name: docker_network
+                agent_network_subnets:
+                  - 172.18.0.0/16
+            agent_name: example_agent
+            agent_provider:
+            agent_category:
+            service_status: false
+            agent_tags:
+              - TAG1
+                - TAG2
+            network_ids: [ ]
+            container_info: [ ]
+            location_lat: -35.28913
+            location_lon: 91.67335
       type: object
       properties:
         id:
