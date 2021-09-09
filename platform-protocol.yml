@@ -1034,12 +1034,26 @@ components:
       type: object
       description: Status after adding route to host routing table.
       properties:
-        connection_id:
-          $ref: '#/components/schemas/connection_id'
-        connection_group_id:
-          $ref: '#/components/schemas/connection_id'
-        statuses:
-          $ref: '#/components/schemas/route_statuses'
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: "-"
+        type:
+          type: string
+          const: WG_ROUTE_STATUS
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - connection_group_id
+              - statuses
+            properties:
+              connection_id:
+                $ref: '#/components/schemas/connection_id'
+              connection_group_id:
+                $ref: '#/components/schemas/connection_group_id'
+              statuses:
+                $ref: '#/components/schemas/route_statuses'
 
     route_statuses:
       type: array
