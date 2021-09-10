@@ -528,7 +528,6 @@ components:
       required:
         - id
         - type
-        - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -653,11 +652,7 @@ components:
                   required:
                     - public_key
                     - internal_ip
-                    - latency_ms
-                    - packet_loss
                     - status
-                    - last_handshake
-                    - keep_alive_interval
                   properties:
                     public_key:
                       $ref: '#/components/schemas/public_key'
