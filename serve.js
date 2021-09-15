@@ -5,11 +5,11 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 // sendFile will go here
-app.get('/reference/protocols/platform', function(req, res) {
+app.get('/platform', function(req, res) {
   res.sendFile(path.join(__dirname, '/platform.html'));
 });
 // sendFile will go here
-app.get('/reference/protocols/sdn', function(req, res) {
+app.get('/sdn', function(req, res) {
   res.sendFile(path.join(__dirname, '/sdn.html'));
 });
 app.listen(port);
