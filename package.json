@@ -8,8 +8,8 @@
     "serve:sdn": "serve public/sdn",
     "serve:platform": "serve public/platform",
     "build": "concurrently \"npm run build:platform\" \"npm run build:sdn\"",
-    "build:platform": "ag platform-protocol.yml @asyncapi/html-template -o ./public/platform -p singleFile=true --force-write",
-    "build:sdn": "ag sdn-protocol.yml @asyncapi/html-template -o ./public/sdn -p singleFile=true --force-write"
+    "build:platform": "path=./public/$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)/platform; ag platform-protocol.yml @asyncapi/html-template -o $path -p singleFile=true --force-write",
+    "build:sdn": "path=./public/$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)/sdn; ag sdn-protocol.yml @asyncapi/html-template -o $path -p singleFile=true --force-write"
   },
   "repository": {
     "type": "git",
