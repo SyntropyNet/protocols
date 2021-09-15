@@ -118,9 +118,26 @@ components:
         $ref: '#/components/schemas/GET_INFO_ATC'
       examples:
         - payload:
-            id: nEsBfD773UlafZ12
+            id: 4QpCCN4NDhwAGi1X
+            executed_at: '2021-09-14T23:21:50.631912'
             type: GET_INFO
-            data: {}
+            data:
+              external_ip: 80.208.227.130
+              network_info:
+                - agent_network_id: b1fa1f0bdc38eb1862e1fcdcdcf2f26883c2f63473fe57f87ebe08ad48366200
+                  agent_network_name: bridge
+                  agent_network_subnets:
+                    - 172.17.0.0/16
+              agent_name: 2yfq.l.time4vps.cloud
+              agent_provider:
+              agent_category:
+              service_status: false
+              agent_tags: [ ]
+              network_ids: [ ]
+              container_info: [ ]
+              location_lat:
+              location_lon:
+
 
     CONFIG_INFO_CTA:
       description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
