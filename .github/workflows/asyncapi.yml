@@ -31,7 +31,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            syntropynet/protocols:sandbox
+            syntropynet/protocols:prod
+            syntropynet/protocols:stable
           platforms: linux/amd64
       -
         name: DEVEL Build and push
