@@ -5,5 +5,5 @@ This repository contains automatically generated documentation for <https://prot
 ## Development
 
 * npm install
-* npm build
-* npm serve
+* npm run build
+* npm run serve
