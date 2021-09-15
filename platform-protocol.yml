@@ -45,7 +45,7 @@ channels:
       description: Receive messages from the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO_ATC'
+          - $ref: '#/components/messages/GET_INFO_CTA'
           - $ref: '#/components/messages/CONFIG_INFO_CTA'
           - $ref: '#/components/messages/AUTO_PING_CTA'
           - $ref: '#/components/messages/WG_CONF_CTA'
@@ -54,7 +54,7 @@ channels:
       description: Send messeges to the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO_CTA'
+          - $ref: '#/components/messages/GET_INFO_ATC'
           - $ref: '#/components/messages/CONFIG_INFO_ATC'
           - $ref: '#/components/messages/AUTO_PING_ATC'
           - $ref: '#/components/messages/IFACES_PEERS_BW_DATA_ATC'
