@@ -2,7 +2,6 @@
   "name": "protocols",
   "version": "0.1.0",
   "description": "Syntropy protocols documentation",
-  "main": "index.js",
   "private": true,
   "scripts": {
     "serve": "serve",
