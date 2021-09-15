@@ -4,9 +4,9 @@
   "description": "Syntropy protocols documentation",
   "private": true,
   "scripts": {
-    "serve": "serve",
-    "serve:sdn": "serve build/sdn/",
-    "serve:platform": "serve build/platform",
+    "serve": "serve public",
+    "serve:sdn": "serve public/sdn/",
+    "serve:platform": "serve public/platform",
     "build": "concurrently \"npm run build:platform\" \"npm run build:sdn\"",
     "build:platform": "ag platform-protocol.yml @asyncapi/html-template -o ./public/platform -p singleFile=true --force-write --debug",
     "build:sdn": "ag sdn-protocol.yml @asyncapi/html-template -o ./public/sdn -p singleFile=true --force-write"
@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/SyntropyNet/protocols.git"
   },
-  "author": "Syntropy",
+  "author": "Syntropy Stack (http://www.syntropystack.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/SyntropyNet/protocols/issues"
