@@ -1,0 +1,34 @@
+{
+  "name": "protocols",
+  "version": "0.1.0",
+  "description": "Syntropy protocols documentation",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "serve": "serve",
+    "serve:sdn": "serve sdn/",
+    "serve:platform": "serve platform",
+    "build": "concurrently \"npm run build:platform\" \"npm run build:sdn\"",
+    "build:platform": "ag platform-protocol.yml @asyncapi/html-template -o ./platform -p singleFile=true --force-write --debug",
+    "build:sdn": "ag sdn-protocol.yml @asyncapi/html-template -o ./sdn -p singleFile=true --force-write",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SyntropyNet/protocols.git"
+  },
+  "author": "Syntropy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SyntropyNet/protocols/issues"
+  },
+  "homepage": "https://github.com/SyntropyNet/protocols#readme",
+  "devDependencies": {
+    "@asyncapi/generator": "^1.8.9",
+    "serve": "^12.0.1"
+  },
+  "dependencies": {
+    "@asyncapi/html-template": "^0.23.7",
+    "concurrently": "^6.2.1"
+  }
+}
