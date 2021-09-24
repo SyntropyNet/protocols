@@ -48,7 +48,7 @@ channels:
           - $ref: '#/components/messages/GET_INFO_CTA'
           - $ref: '#/components/messages/CONFIG_INFO_CTA'
           - $ref: '#/components/messages/AUTO_PING_CTA'
-          - $ref: '#/components/messages/WG_CONF_CTA'
+          - $ref: '#/components/messages/PEER_CONF_CTA'
 
     publish:
       description: Send messeges to the controller
@@ -221,14 +221,14 @@ components:
                   listen_port: 49154
                   ifname: SYNTROPY_SDN3
                   internal_ip: 10.69.14.100
-    WG_CONF_CTA:
+    PEER_CONF_CTA:
       description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
       payload:
-        $ref: '#/components/schemas/WG_CONF_CTA'
+        $ref: '#/components/schemas/PEER_CONF_CTA'
       examples:
         - payload:
             id: Asa05ML1102HSJVl
-            type: WG_CONF_CTA
+            type: PEER_CONF_CTA
             data:
               -
                 fn: add_peer
@@ -256,7 +256,7 @@ components:
                     agent_service_subnet_ip: 172.20.0.0/26
         - payload:
             id: Asa05ML1102HSJVl
-            type: WG_CONF_CTA
+            type: PEER_CONF_CTA
             data:
               -
                 fn: remove_peer
@@ -438,6 +438,10 @@ components:
           type: object
     GET_INFO_ATC:
       type: object
+      required:
+        - id
+        - type
+        - data
       properties:
         id:
           type: string
@@ -447,45 +451,43 @@ components:
         data:
           type: object
           properties:
-            agent_provider:
-              type: integer
-              description: Agent provider id (https://docs.syntropystack.com/docs/syntropy-agent-variables#syntropy-provider).
-            service_status:
-              type: boolean
-              description: Status whether services are enabled by default or not.
-            agent_tags:
-              type: array
-              description: Array of tags.
-              items:
-                type: string
-                description: Tag in string format.
-            external_ip:
-              type: string
-              description: Agent host public ip.
-            network_info:
-              type: array
-              description: Array of docker network objects.
-              items:
-                description: Docker network object.
-                type: object
-                properties:
-                  agent_network_id:
+            agent:
+              type: object
+              required:
+                - name
+                - public_ip
+                - operating_system
+                - version
+              properties:
+                  name:
                     type: string
-                    description: unique id of docker network.
-                  agent_network_name:
+                  provider:
                     type: string
-                  agent_network_subnets:
+                  tags:
                     type: array
-                    description: Subnets that current network owns.
+                    description: Array of tags.
                     items:
                       type: string
-            container_info:
-              $ref: '#/components/schemas/container_info'
-          required:
-            - service_status
-      required:
-        - id
-        - type
+                      description: Tag in string format.
+                    public_ip:
+                      type: string
+                      description: Agent host public ip.
+                    version:
+                      type: string
+                      description: "Agent software version. Semantic Versioning (x.x.x)."
+                    operating_system:
+                      type: string
+                      enum:
+                        - LINUX
+                        - DARWIN
+                        - WINDOWS
+            config:
+              type: object
+              properties:
+                auto_connect_services:
+                  type: boolean
+                  default: False
+                  description: "Status whether services will be connected by default or not."
 
     CONFIG_INFO_CTA:
       type: object
@@ -524,27 +526,14 @@ components:
           type: string
           const: CONFIG_INFO_ATC
         data:
-          type: array
+          type: object
           description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from CONFIG_INFO_CTA.
-          items:
-            type: object
-            properties:
-              fn:
-                type: string
-                description: Executed command.
-              data:
-                type: object
-                description: Interface info
-                properties:
-                  ifname:
-                    type: string
-                  public_key:
-                    $ref: '#/components/schemas/public_key'
-                  port:
-                    $ref: '#/components/schemas/port'
-                  internal_ip:
-                    $ref: '#/components/schemas/internal_ip'
-    WG_CONF_CTA:
+          properties:
+            interfaces:
+              type: array
+              items:
+                - $ref: '#/components/schemas/interface'
+    PEER_CONF_CTA:
       type: object
       required:
         - id
@@ -555,17 +544,12 @@ components:
           $ref: '#/components/schemas/msg_id'
         type:
           type: string
-          const: WG_CONF_CTA
+          const: PEER_CONF_CTA
         data:
           type: array
           description: List of wireguard configration commands
           items:
-            type: object
-            oneOf:
-              - $ref: '#/components/schemas/create_interface'
-              - $ref: '#/components/schemas/remove_interface'
-              - $ref: '#/components/schemas/add_peer'
-              - $ref: '#/components/schemas/remove_peer'
+            - $ref: '#/components/schemas/peer'
 
 
     IFACES_BW_DATA_ATC:
