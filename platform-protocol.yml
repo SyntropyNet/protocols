@@ -57,14 +57,10 @@ channels:
           - $ref: '#/components/messages/GET_INFO_ATC'
           - $ref: '#/components/messages/CONFIG_INFO_ATC'
           - $ref: '#/components/messages/AUTO_PING_ATC'
-          - $ref: '#/components/messages/IFACES_PEERS_BW_DATA_ATC'
-          - $ref: '#/components/messages/IFACES_BW_DATA_ATC'
+          - $ref: '#/components/messages/NETWORK_STATISTICS_ATC'
           - $ref: '#/components/messages/IFACES_PEERS_ACTIVE_DATA_ATC'
           - $ref: '#/components/messages/LOGGER_ATC'
-          - $ref: '#/components/messages/NETWORK_INFO_ATC'
-          - $ref: '#/components/messages/CONTAINER_INFO_ATC'
-          - $ref: '#/components/messages/HW_SERVICE_INFO_ATC'
-          - $ref: '#/components/messages/KUBERNETES_SERVICE_INFO_ATC'
+          - $ref: '#/components/messages/SERVICE_INFO_ATC'
 
 
 components:
@@ -272,79 +268,38 @@ components:
                 allowed_ips:
                  - 10.69.10.86/32
 
-    IFACES_PEERS_BW_DATA_ATC:
+    NETWORK_STATISTICS_ATC:
       description: Platform agent periodically sends wireguard configured interfaces peers bandwith data (bandwith of one particular peer via particular interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
       payload:
-        $ref: '#/components/schemas/IFACES_PEERS_BW_DATA_ATC'
+        $ref: '#/components/schemas/NETWORK_STATISTICS_ATC'
       examples:
         - payload:
             id: "-"
             executed_at: "2021-09-08T12:22:01.248033"
-            type: IFACES_PEERS_BW_DATA_ATC
+            type: NETWORK_STATISTICS_ATC
             data:
-              - iface: SYNTROPY_PUBLIC
-                iface_public_key: nctTdgN8znYkyUvfeUmaPv7DxmTd3rfo+usC6dImaRQ=
+              - ifname: SYNTROPY_PUBLIC
                 peers:
-                  - ifname: SYNTROPY_PUBLIC
-                    public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
-                    allowed_ips:
-                      - 10.69.10.93/32
+                  - connection_id: 2344
+                    connection_group_id: 344
                     last_handshake: '2021-09-08T03:35:52'
-                    keep_alive_interval: 15
                     rx_bytes: 308
                     tx_bytes: 888380
-                    timestamp: 1631103713.179484
-                    internal_ip: 10.69.10.93
                     latency_ms:
                     packet_loss: 1
-                    rx_speed_mbps: 0
-                    tx_speed_mbps: -2.2794318546905317e-05
-                    status: OFFLINE
-                    status_reason: Packet loss 100%
-              - iface: SYNTROPY_SDN1
-                iface_public_key: gwEcTlpb1G5lZbITi12TketrWs8i3mcpImQ3FE0+fxU=
+                    rx_speed_bps: 0
+                    tx_speed_bps: 0.000022794318546905317
+              - ifname: SYNTROPY_SDN1
                 peers:
-                  - ifname: SYNTROPY_SDN1
-                    public_key: tkjx2fMmLqnK2f/iSquNZdBKOObeyC2+kSWCCHBXcxk=
-                    allowed_ips:
-                    - 10.69.5.158/32
-                    last_handshake: '2021-08-18T07:19:24'
-                    keep_alive_interval: 15
+                  - connection_id: 3244
+                    connection_group_id: 345
                     rx_bytes: 372556
                     tx_bytes: 417812
-                    timestamp: 1629271224.722649
-                    internal_ip: 10.69.5.158
-                    status: CONNECTED
                     latency_ms: 188.1084442138672
                     packet_loss: 0
-                    rx_speed_mbps: 0.00015519337514969392
-                    tx_speed_mbps: -0.00015466370492734
-              - iface: SYNTROPY_SDN2
-                iface_public_key: Vb6584v7UAwT1T0XLwg/hd/OzvDWh0/47zNkCQERmDo=
-                peers:
-                  - ifname: SYNTROPY_SDN2
-                    public_key: sfWquyQ/BDva7BWPegKHDC4HUhy+VcEfRTA6mX8fAyg=
-                    allowed_ips:
-                    - 10.69.5.159/32
-                    last_handshake: '2021-08-18T07:19:24'
-                    keep_alive_interval: 15
-                    rx_bytes: 372556
-                    tx_bytes: 417516
-                    timestamp: 1629271224.728945
-                    internal_ip: 10.69.5.159
-                    status: CONNECTED
-                    latency_ms: 185.84465980529785
-                    packet_loss: 0
-                    rx_speed_mbps: 0.00015976386728270547
-                    tx_speed_mbps: -0.00015618854658926737
-              - iface: SYNTROPY_SDN3
-                iface_public_key: oIGZCz9Dazl1caNczHkn82jVcIWQxfk7a3kEoVRT7Hc=
-                peers: [ ]
-
-    IFACES_BW_DATA_ATC:
-      description: Platform agent periodically sends wireguard configured interfaces bandwith data (entire bandwidth passed via given interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
-      payload:
-        $ref: '#/components/schemas/IFACES_BW_DATA_ATC'
+                    rx_speed_bps: 3453
+                    tx_speed_bps: 4545
+                    
 
     IFACES_PEERS_ACTIVE_DATA_ATC:
       description: Platform agent sends information when current ACTIVE route changes.
@@ -356,25 +311,10 @@ components:
       payload:
         $ref: '#/components/schemas/LOGGER_ATC'
 
-    NETWORK_INFO_ATC:
+    SERVICE_INFO_ATC:
       description: This event is triggered when platform agent network changes. Platform agent sends entire list of available services and their metadata.
       payload:
-        $ref: '#/components/schemas/NETWORK_INFO_ATC'
-
-    CONTAINER_INFO_ATC:
-      description: This event is triggered when platform agent active docker containers changes. Platform agent sends entire list of available services and their metadata.
-      payload:
-        $ref: '#/components/schemas/CONTAINER_INFO_ATC'
-
-    HW_SERVICE_INFO_ATC:
-      description: This event is triggered when platform agent host hw network changes. Platform agent sends entire list of available services and their metadata.
-      payload:
-        $ref: '#/components/schemas/HW_SERVICE_INFO_ATC'
-
-    KUBERNETES_SERVICE_INFO_ATC:
-      description: This event is triggered when services statuses changes in kubernes cluster. Platform agent sends entire list of available services and their metadata.
-      payload:
-        $ref: '#/components/schemas/KUBERNETES_SERVICE_INFO_ATC'
+        $ref: '#/components/schemas/SERVICE_INFO_ATC'
 
     WG_ROUTE_STATUS:
       description: Platform agent sends information about route addition. Confirms successes and failures.
@@ -403,6 +343,8 @@ components:
       required:
           - type
           - data
+
+
     AUTO_PING_ATC:
       type: object
       properties:
@@ -423,6 +365,8 @@ components:
                 type: integer
               packet_loss:
                 type: number
+
+
     GET_INFO_CTA:
       type: object
       required:
@@ -436,6 +380,8 @@ components:
           const: GET_INFO
         data:
           type: object
+
+
     GET_INFO_ATC:
       type: object
       required:
@@ -489,6 +435,7 @@ components:
                   default: False
                   description: "Status whether services will be connected by default or not."
 
+
     CONFIG_INFO_CTA:
       type: object
       required:
@@ -513,6 +460,8 @@ components:
                type: array
                items:
                 - $ref: '#/components/schemas/interface'
+
+
     CONFIG_INFO_ATC:
       type: object
       description: Need to send only if interfaces updated compared to CONFIG_INFO_CTA.
@@ -533,6 +482,8 @@ components:
               type: array
               items:
                 - $ref: '#/components/schemas/interface'
+
+
     PEER_CONF_CTA:
       type: object
       required:
@@ -551,8 +502,7 @@ components:
           items:
             - $ref: '#/components/schemas/peer'
 
-
-    IFACES_BW_DATA_ATC:
+    NETWORK_STATISTICS_ATC:
       type: object
       required:
         - id
@@ -564,96 +514,43 @@ components:
           default: "-"
         type:
           type: string
-          const: IFACES_BW_DATA_ATC
-        data:
-          type: array
-          description: List of interfaces with BW data
-          items:
-            type: object
-            properties:
-              iface:
-                type: string
-              rx_speed_mbps:
-                $ref: '#/components/schemas/rx_speed_mbps'
-              tx_speed_mbps:
-                $ref: '#/components/schemas/tx_speed_mbps'
-              tx_dropped:
-                type: integer
-              rx_dropped:
-                type: integer
-              tx_errors:
-                type: integer
-              rx_errors:
-                type: integer
-              tx_packets:
-                type: integer
-              rx_packets:
-                type: integer
-              interval:
-                type: integer
-
-    IFACES_PEERS_BW_DATA_ATC:
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-          default: "-"
-        type:
-          type: string
-          const: IFACES_PEERS_BW_DATA_ATC
+          const: NETWORK_STATISTICS_ATC
         data:
           type: array
           description: List of interfaces with analytic peers data.
           items:
             type: object
             required:
-              - iface
-              - iface_public_key
+              - ifname
             properties:
-              iface:
-                type: string
-              iface_public_key:
+              ifname:
                 type: string
               peers:
                 type: array
                 items:
                   type: object
                   required:
-                    - public_key
-                    - internal_ip
-                    - status
+                    - connection_id
+                    - connection_group_id
                   properties:
-                    public_key:
-                      $ref: '#/components/schemas/public_key'
-                    allowed_ips:
-                      $ref: '#/components/schemas/allowed_ips'
-                    internal_ip:
-                      $ref: '#/components/schemas/internal_ip'
+                    connection_id:
+                      $ref: '#/components/schemas/connection_id'
+                    connection_group_id:
+                      $ref: '#/components/schemas/connection_group_id'
+                    last_handshake:
+                      type: string
                     latency_ms:
                       $ref: '#/components/schemas/latency_ms'
                     packet_loss:
                       $ref: '#/components/schemas/packet_loss'
-                    status:
-                      $ref: '#/components/schemas/peer_status'
                     rx_bytes:
                       $ref: '#/components/schemas/rx_bytes'
                     tx_bytes:
                       $ref: '#/components/schemas/tx_bytes'
-                    tx_speed_mbps:
-                      $ref: '#/components/schemas/tx_speed_mbps'
-                    rx_speed_mbps:
-                      $ref: '#/components/schemas/rx_speed_mbps'
-                    connection_id:
-                      $ref: '#/components/schemas/connection_id'
-                    last_handshake:
-                      type: string
-                    keep_alive_interval:
-                      type: integer
-
+                    tx_speed_bps:
+                      $ref: '#/components/schemas/tx_speed_bps'
+                    rx_speed_bps:
+                      $ref: '#/components/schemas/rx_speed_bps'
 
     IFACES_PEERS_ACTIVE_DATA_ATC:
       type: object
@@ -708,7 +605,7 @@ components:
               type: string
 
 
-    NETWORK_INFO_ATC:
+    SERVICE_INFO_ATC:
       type: object
       required:
         - id
@@ -720,7 +617,7 @@ components:
           default: "-"
         type:
           type: string
-          const: NETWORK_INFO_ATC
+          const: SERVICE_INFO_ATC
         data:
           type: array
           items:
@@ -730,91 +627,19 @@ components:
               - docker_network_name
               - docker_network_subnets
             properties:
-              docker_network_id:
+              name:
                 type: string
-              docker_network_name:
+              type:
+                $ref: '#/components/schemas/service_type'
+              ip:
                 type: string
-              docker_network_subnets:
-                $ref: '#/components/schemas/subnets'
-
-    CONTAINER_INFO_ATC:
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-          default: "-"
-        type:
-          type: string
-          const: CONTAINER_INFO_ATC
-        data:
-          type: object
-          required:
-            - container_info
-          properties:
-            container_info:
-              $ref: '#/components/schemas/container_info'
-
-    HW_SERVICE_INFO_ATC:
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-          default: "-"
-        type:
-          type: string
-          const: HW_SERVICE_INFO_ATC
-        data:
-          type: array
-          items:
-            type: object
-            required:
-              - agent_network_subnets
-              - agent_network_iface
-              - agent_network_ports
-            properties:
-              agent_network_subnets:
-                $ref: '#/components/schemas/subnets'
-              agent_network_iface:
-                type: string
-              agent_network_ports:
+              network:
+                type: array
+                items:
+                  type: string
+              ports:
                 $ref: '#/components/schemas/service_ports'
 
-    KUBERNETES_SERVICE_INFO_ATC:
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-          default: "-"
-        type:
-          type: string
-          const: KUBERNETES_SERVICE_INFO_ATC
-        data:
-          type: array
-          items:
-            type: object
-            required:
-              - agent_service_subnets
-              - agent_service_name
-              - agent_service_ports
-            properties:
-              agent_service_subnets:
-                $ref: '#/components/schemas/subnets'
-              agent_service_name:
-                type: string
-              agent_service_ports:
-                $ref: '#/components/schemas/service_ports'
 
     create_interface:
       type: object
@@ -1064,7 +889,7 @@ components:
 
     service_ports:
       type: object
-      description: Container ips.
+      description: Service ports.
       properties:
         udp:
           $ref: '#/components/schemas/udp_ports'
@@ -1105,13 +930,6 @@ components:
     packet_loss:
       type: number
 
-    peer_status:
-      type: string
-      enum:
-        - CONNECTED
-        - WARNING
-        - OFFLINE
-
     peer_action:
       type: string
       enum:
@@ -1124,6 +942,13 @@ components:
         - ERROR
         - OK
 
+    service_type:
+      type: string
+      enum:
+        - DOCKER
+        - KUBERNETES
+        - HOST
+        -
     allowed_ips:
       type: array
       description: List of ips.
@@ -1140,10 +965,10 @@ components:
     tx_bytes:
       type: integer
 
-    tx_speed_mbps:
+    tx_speed_bps:
       type: number
 
-    rx_speed_mbps:
+    rx_speed_bps:
       type: number
 
     connection_id:
