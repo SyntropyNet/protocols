@@ -1,0 +1,77 @@
+syntax = "proto3"
+package platform;
+
+// NOTE: 
+// Authentication is implemented differently
+service Platform {
+    // This is the first call to the platform.
+    // Subscribes to server events.
+    // See below messages for possible events.
+    rpc Subscribe() returns (stream Event){}
+
+    // Set data about the agent
+    rpc SetAgentInfo(AgentInfo) {}
+    rpc SetConfiguration(AgentConfig) {}
+
+    // Retrieve data from the controller
+    rpc GetSDNNodes() returns (stream SDNNode){}
+    rpc GetConfiguration() returns (AgentConfig) {}
+    rpc GetConfigPlan() returns (stream ConfigPlan){}
+
+    // Periodic streaming
+    rpc ReportTunnelStatus(stream TunnelStatus) {}
+    rpc ReportNetworkStatistics(stream NetworkStatistics) {}
+    rpc ReportPingResults(stream PingResult) {}
+    rpc ReportLogs(stream LogItem) {}
+}
+
+
+// Message that describes Events
+enum EventType {
+    REQUEST_AGENT_INFO = 1;     // this event requests an agent to call SetAgentInfo
+    REQUEST_CONFIG_INFO = 2;    // this event requests an agent to call SetConfriguration
+    REQUEST_LOGS = 3;           // this event requests an agent to call ReportLogs
+    NOTIFY_AGENT_CONFIG = 10;   // this event notifies an agent that AgentConfig is available
+    NOTIFY_CONFIG_PLAN = 11;    // --//-- that ConfigPlan is available
+    NOTIFY_SDN_NODES = 12;      // --//-- that a list of SDN nodes is available
+}
+
+message Event {
+    EventType Type = 1;
+    string Id = 2;
+
+}
+
+// Messages that are sent to the controller
+message AgentInfo {
+// the same as AGENT_INFO_ATC
+}
+
+message AgentConfig {
+// the same as AGENT_CONFIG_ATC
+}
+
+message TunnelStatus {
+// the same as WG_STATUS_ATC
+}
+
+message PingResult {
+    string Address = 1;
+    float RTT = 2;
+    float PacketLoss = 3;
+}
+
+enum LogLevel {
+    DEBUG = 0;
+    INFO = 1;
+    //etc
+}
+
+message LogItem {
+    LogLevel Level = 1;
+    string Message = 2;
+    string StackTrace = 3;
+}
+
+// Messages that are retrieved from the controller
+
