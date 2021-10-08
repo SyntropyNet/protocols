@@ -2,7 +2,7 @@ syntax = "proto3"
 package platform;
 
 // NOTE: 
-// Authentication is implemented differently
+// Authentication is a separate layer not described by the schema.
 service Platform {
     // This is the first call to the platform.
     // Subscribes to server events.
@@ -16,14 +16,41 @@ service Platform {
     // Retrieve data from the controller
     rpc GetSDNNodes() returns (stream SDNNode){}
     rpc GetConfiguration() returns (AgentConfig) {}
-    rpc GetConfigPlan() returns (stream ConfigPlan){}
+    rpc GetConfigPlan() returns (stream ConfigPlanItem){}
 
     // Periodic streaming
-    rpc ReportTunnelStatus(stream TunnelStatus) {}
-    rpc ReportNetworkStatistics(stream NetworkStatistics) {}
-    rpc ReportPingResults(stream PingResult) {}
+    rpc ReportHealth(stream Health) {}  // Either one streamer or three separate (commented out below)
+    // rpc ReportTunnelStatus(stream TunnelStatus) {}
+    // rpc ReportNetworkStatistics(stream NetworkStatistics) {}
+    // rpc ReportPingResults(stream PingResult) {}
     rpc ReportLogs(stream LogItem) {}
 }
+
+/**
+
+The principle only slightly deviates from the Websockets, however, the benefits are virtually the same due to HTTP/2:
+- bidirectional communication
+- low latency communication
+- asynchronous
+
+The benefits of the gRPC versus custom messaging via Websockets:
+- highly tested client/server libraries across many languages
+- automatically generated client/server libraries
+- robust underlying transport mechanism
+- automagic load balancing and other niceities that contribute to better scalability
+- schema simplicity
+- clear separation of concerns
+- efficient data transfer (binary data by default. can be json, etc. with extensions)
+
+The crux of the protocol is:
+- agent calls Subscribe method and waits on any events streamed from the controller
+- If the Subscribe method succeeded(auth ok etc), then the agent will call SetAgentInfo
+- when appropriate event arrives through Event stream, agent will process this event and take appropriate actions
+- Controller does not send specific configs/ip lists etc, it just informs the agent, that this info is available
+
+NOTE: The authentication is a separate layer though.
+
+**/
 
 
 // Message that describes Events
@@ -43,18 +70,34 @@ message Event {
 }
 
 // Messages that are sent to the controller
+message AgentStatus {
+    bool Healthy = 1;
+    float CpuUsage = 2;
+    float MemoryUsage = 3;
+    int CpuCount = 4;
+    int AvailableMemory = 5;
+    float ControllerLatency = 6; // measure how fast the communication with the controller happens
+    // etc
+}
+
 message AgentInfo {
-// the same as AGENT_INFO_ATC
+    AgentStatus Status;
+    // the same as AGENT_INFO_ATC
 }
 
 message AgentConfig {
-// the same as AGENT_CONFIG_ATC
+    // the same as AGENT_CONFIG_ATC
 }
 
 message TunnelStatus {
-// the same as WG_STATUS_ATC
+    // the same as WG_STATUS_ATC
 }
 
+message NetworkStatus {
+    // the same as WG_STATUS_ATC
+}
+
+            
 message PingResult {
     string Address = 1;
     float RTT = 2;
@@ -73,5 +116,26 @@ message LogItem {
     string StackTrace = 3;
 }
 
-// Messages that are retrieved from the controller
+message Health {
+    AgentStatus Agent = 1;
+    repeated TunnelStatus Tunnels = 2;
+    repeated NetworkStatus Networks = 3;
+    repeated PingResult Pings = 4;
+}
 
+// Messages that are retrieved from the controller
+message SDNNode {
+    string Address = 1;
+    bool DARP = 2;
+    float PingInterval = 3;
+}
+
+message ConfigPlanItem {
+    // Same/similar as PEER_CONF_CTA.data, i.e. a WG config command
+}
+
+message ConfigPlan {
+    // this is essentially the same as PEER_CONF_CTA
+    string AgentID = 1;
+    repeated ConfigPlanItem = 2;
+}
