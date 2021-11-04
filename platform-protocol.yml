@@ -59,7 +59,7 @@ channels:
           - $ref: '#/components/messages/CONFIG_INFO_ATC'
           - $ref: '#/components/messages/AUTO_PING_ATC'
           - $ref: '#/components/messages/NETWORK_STATISTICS_ATC'
-          - $ref: '#/components/messages/IFACES_PEERS_ACTIVE_DATA_ATC'
+          - $ref: '#/components/messages/SERVICE_ROUTE_CHANGE_ATC'
           - $ref: '#/components/messages/LOGGER_ATC'
           - $ref: '#/components/messages/SERVICE_INFO_ATC'
           - $ref: '#/components/messages/ERRORS_ATC'
@@ -319,10 +319,10 @@ components:
                     tx_speed_bps: 4545
                     
 
-    IFACES_PEERS_ACTIVE_DATA_ATC:
+    SERVICE_ROUTE_CHANGE_ATC:
       description: Platform agent sends information when current ACTIVE route changes.
       payload:
-        $ref: '#/components/schemas/IFACES_PEERS_ACTIVE_DATA_ATC'
+        $ref: '#/components/schemas/SERVICE_ROUTE_CHANGE_ATC'
 
     LOGGER_ATC:
       description: Platform agent sends nicely formatted log data to controller. This data is later redirected to platform agents index for users to consume.
@@ -362,7 +362,7 @@ components:
                 value:
                   - DISK_PRESSURE
 
-    WG_ROUTE_STATUS:
+    SERVICE_STATUS:
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
         $ref: '#/components/schemas/wg_route_status'
@@ -397,6 +397,8 @@ components:
         type:
           type: string
           const: AUTO_PING
+        executed_at:
+          type: string
         data:
           type: array
           description: Array of ips.
@@ -436,6 +438,8 @@ components:
         - data
       properties:
         id:
+          type: string
+        executed_at:
           type: string
         type:
           type: string
@@ -504,6 +508,8 @@ components:
       properties:
         id:
           type: string
+        executed_at:
+          type: string
         type:
           type: string
           const: SUPPORT_INFO
@@ -548,6 +554,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
+        executed_at:
+          type: string
         type:
           type: string
           const: CONFIG_INFO
@@ -589,6 +597,8 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          type: string
         type:
           type: string
           const: NETWORK_STATISTICS_ATC
@@ -629,7 +639,7 @@ components:
                     rx_speed_bps:
                       $ref: '#/components/schemas/rx_speed_bps'
 
-    IFACES_PEERS_ACTIVE_DATA_ATC:
+    SERVICE_ROUTE_CHANGE_ATC:
       type: object
       required:
         - id
@@ -639,9 +649,11 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          type: string
         type:
           type: string
-          const: IFACES_PEERS_ACTIVE_DATA_ATC
+          const: SERVICE_ROUTE_CHANGE_ATC
         data:
           type: array
           description: List of peers connections that became active after rerouting event.
@@ -649,12 +661,9 @@ components:
             type: object
             required:
               - connection_id
-              - timestamp
             properties:
               connection_id:
                 $ref: '#/components/schemas/connection_id'
-              timestamp:
-                type: string
 
 
     LOGGER_ATC:
@@ -667,6 +676,8 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          type: string
         type:
           type: string
           const: LOGGER_ATC
@@ -692,6 +703,8 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          type: string
         type:
           type: string
           const: SERVICE_INFO_ATC
@@ -728,6 +741,8 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          type: string
         type:
           type: string
           const: ERRORS_ATC
@@ -954,7 +969,7 @@ components:
           default: "-"
         type:
           type: string
-          const: WG_ROUTE_STATUS
+          const: SERVICE_STATUS
         data:
           type: array
           items:
