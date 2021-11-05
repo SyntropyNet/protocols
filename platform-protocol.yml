@@ -166,7 +166,7 @@ components:
               agent_id: 1664
               interfaces:
                 -
-                  label: PUBLIC
+                  name: PUBLIC
                   private_ip: 10.69.0.146
                   public_key: RzaBT6fXJime+KEFJKkWrozumOEDPpZhJaHWPZmerAA=
                   port: 35524
@@ -823,10 +823,10 @@ components:
       type: object
       required:
         - internal_ip
-        - public_key
+        - name
       properties:
-        label:
-          $ref: '#/components/schemas/label'
+        name:
+          $ref: '#/components/schemas/int_name'
         internal_ip:
           $ref: '#/components/schemas/internal_ip'
         public_key:
@@ -1094,8 +1094,14 @@ components:
     public_key:
       type: string
 
-    label:
+    int_name:
       type: string
+      enum:
+        - PUBLIC
+        - SDN1
+        - SDN2
+        - SDN3
+
 
     internal_ip:
       type: string
