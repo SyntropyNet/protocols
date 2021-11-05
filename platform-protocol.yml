@@ -44,7 +44,7 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/GET_INIT_INFO (CTA)'
-          - $ref: '#/components/messages/SET_CONFIG_INFO (CTA)'
+          - $ref: '#/components/messages/SET_CONFIG (CTA)'
           - $ref: '#/components/messages/SET_AUTO_PING (CTA)'
           - $ref: '#/components/messages/SET_PEER_CONF (CTA)'
           - $ref: '#/components/messages/GET_SUPPORT_INFO (CTA)'
@@ -152,16 +152,16 @@ components:
         $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
 
 
-    SET_CONFIG_INFO (CTA):
+    SET_CONFIG (CTA):
       description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
       payload:
-        $ref: '#/components/schemas/SET_CONFIG_INFO'
+        $ref: '#/components/schemas/SET_CONFIG'
       x-response:
         $ref: '#/components/messages/CONFIG_INFO (ATC)'
       examples:
         - payload:
             id: Asa05ML1102HSJVl
-            type: SET_CONFIG_INFO
+            type: SET_CONFIG
             data:
               agent_id: 1664
               interfaces:
@@ -195,7 +195,7 @@ components:
                           - DEL
 
     CONFIG_INFO (ATC):
-      summary: CONFIG_INFO (ATC) is a response to SET_CONFIG_INFO (CTA) message
+      summary: CONFIG_INFO (ATC) is a response to SET_CONFIG (CTA) message
       description: Platform agents sends this event to controller when it wants to update configuration data, i.e. to change configured interface public key due to unrecoverable loss of data on platform agents side.
       payload:
         $ref: '#/components/schemas/CONFIG_INFO (ATC)'
@@ -512,7 +512,7 @@ components:
             $ref: '#/components/schemas/support_info'
 
 
-    SET_CONFIG_INFO:
+    SET_CONFIG:
       type: object
       required:
         - id
@@ -523,7 +523,7 @@ components:
           $ref: '#/components/schemas/msg_id'
         type:
           type: string
-          const: SET_CONFIG_INFO
+          const: SET_CONFIG
         data:
           type: object
           required:
@@ -540,7 +540,7 @@ components:
 
     CONFIG_INFO (ATC):
       type: object
-      description: Need to send only if interfaces updated compared to SET_CONFIG_INFO (CTA).
+      description: Need to send only if interfaces updated compared to SET_CONFIG (CTA).
       required:
         - id
         - type
@@ -554,7 +554,7 @@ components:
           const: CONFIG_INFO
         data:
           type: object
-          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from SET_CONFIG_INFO (CTA).
+          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from SET_CONFIG (CTA).
           properties:
             interfaces:
               type: array
