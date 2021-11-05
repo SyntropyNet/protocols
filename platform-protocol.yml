@@ -460,18 +460,18 @@ components:
                     items:
                       type: string
                       description: Tag in string format.
-                    public_ip:
-                      type: string
-                      description: Agent host public ip.
-                    version:
-                      type: string
-                      description: "Agent software version. Semantic Versioning (x.x.x)."
-                    operating_system:
-                      type: string
-                      enum:
-                        - LINUX
-                        - DARWIN
-                        - WINDOWS
+                  public_ip:
+                    type: string
+                    description: Agent host public ip.
+                  version:
+                    type: string
+                    description: "Agent software version. Semantic Versioning (x.x.x)."
+                  operating_system:
+                    type: string
+                    enum:
+                      - LINUX
+                      - DARWIN
+                      - WINDOWS
             config:
               type: object
               properties:
