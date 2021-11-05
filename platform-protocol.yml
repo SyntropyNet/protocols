@@ -18,6 +18,8 @@ info:
         "X-DeviceId": "Unique device ID.",
       }
       ```
+    ### Github
+    - https://github.com/SyntropyNet/protocols/tree/v2-proposal
 servers:
   prod:
     url: controller-prod-platform-agents.syntropystack.com
