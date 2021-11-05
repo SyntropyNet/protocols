@@ -63,7 +63,10 @@
               "$ref": "#/components/messages/NETWORK_STATISTICS_ATC"
             },
             {
-              "$ref": "#/components/messages/IFACES_PEERS_ACTIVE_DATA_ATC"
+              "$ref": "#/components/messages/SERVICE_ROUTE_CHANGE_ATC"
+            },
+            {
+              "$ref": "#/components/messages/SERVICE_STATUS_ATC"
             },
             {
               "$ref": "#/components/messages/LOGGER_ATC"
@@ -413,8 +416,8 @@
                       "tx_bytes": 888380,
                       "latency_ms": null,
                       "packet_loss": 1,
-                      "rx_speed_bps": 0,
-                      "tx_speed_bps": 0.000022794318546905317
+                      "rx_speed_bps": 354,
+                      "tx_speed_bps": 553
                     }
                   ]
                 },
@@ -438,10 +441,10 @@
           }
         ]
       },
-      "IFACES_PEERS_ACTIVE_DATA_ATC": {
+      "SERVICE_ROUTE_CHANGE_ATC": {
         "description": "Platform agent sends information when current ACTIVE route changes.",
         "payload": {
-          "$ref": "#/components/schemas/IFACES_PEERS_ACTIVE_DATA_ATC"
+          "$ref": "#/components/schemas/SERVICE_ROUTE_CHANGE_ATC"
         }
       },
       "LOGGER_ATC": {
@@ -507,21 +510,11 @@
           }
         ]
       },
-      "WG_ROUTE_STATUS": {
+      "SERVICE_STATUS_ATC": {
         "description": "Platform agent sends information about route addition. Confirms successes and failures.",
         "payload": {
-          "$ref": "#/components/schemas/wg_route_status"
-        },
-        "examples": [
-          {
-            "payload": {
-              "connectionID": 8628615390848610000,
-              "event": "systemStatus",
-              "status": "online",
-              "version": "1.0.0"
-            }
-          }
-        ]
+          "$ref": "#/components/schemas/service_status"
+        }
       }
     },
     "schemas": {
@@ -552,6 +545,9 @@
           "type": {
             "type": "string",
             "const": "AUTO_PING"
+          },
+          "executed_at": {
+            "type": "string"
           },
           "data": {
             "type": "array",
@@ -603,6 +599,9 @@
         ],
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "executed_at": {
             "type": "string"
           },
           "type": {
@@ -696,6 +695,9 @@
           "id": {
             "type": "string"
           },
+          "executed_at": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
             "const": "SUPPORT_INFO"
@@ -756,6 +758,9 @@
           "id": {
             "$ref": "#/components/schemas/msg_id"
           },
+          "executed_at": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
             "const": "CONFIG_INFO"
@@ -813,6 +818,9 @@
           "id": {
             "$ref": "#/components/schemas/msg_id",
             "default": "-"
+          },
+          "executed_at": {
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -874,7 +882,7 @@
           }
         }
       },
-      "IFACES_PEERS_ACTIVE_DATA_ATC": {
+      "SERVICE_ROUTE_CHANGE_ATC": {
         "type": "object",
         "required": [
           "id",
@@ -886,9 +894,12 @@
             "$ref": "#/components/schemas/msg_id",
             "default": "-"
           },
+          "executed_at": {
+            "type": "string"
+          },
           "type": {
             "type": "string",
-            "const": "IFACES_PEERS_ACTIVE_DATA_ATC"
+            "const": "SERVICE_ROUTE_CHANGE_ATC"
           },
           "data": {
             "type": "array",
@@ -896,15 +907,14 @@
             "items": {
               "type": "object",
               "required": [
-                "connection_id",
-                "timestamp"
+                "connection_id"
               ],
               "properties": {
-                "connection_id": {
+                "prev_connection_id": {
                   "$ref": "#/components/schemas/connection_id"
                 },
-                "timestamp": {
-                  "type": "string"
+                "connection_id": {
+                  "$ref": "#/components/schemas/connection_id"
                 }
               }
             }
@@ -922,6 +932,9 @@
           "id": {
             "$ref": "#/components/schemas/msg_id",
             "default": "-"
+          },
+          "executed_at": {
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -955,6 +968,9 @@
           "id": {
             "$ref": "#/components/schemas/msg_id",
             "default": "-"
+          },
+          "executed_at": {
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -1004,6 +1020,9 @@
           "id": {
             "$ref": "#/components/schemas/msg_id",
             "default": "-"
+          },
+          "executed_at": {
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -1312,7 +1331,7 @@
           }
         }
       },
-      "wg_route_status": {
+      "service_status": {
         "type": "object",
         "description": "Status after adding route to host routing table.",
         "properties": {
@@ -1322,7 +1341,7 @@
           },
           "type": {
             "type": "string",
-            "const": "WG_ROUTE_STATUS"
+            "const": "SERVICE_STATUS"
           },
           "data": {
             "type": "array",
