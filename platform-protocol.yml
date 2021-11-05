@@ -45,7 +45,7 @@ channels:
           - $ref: '#/components/messages/SET_CONFIG_INFO (CTA)'
           - $ref: '#/components/messages/SET_AUTO_PING (CTA)'
           - $ref: '#/components/messages/SET_PEER_CONF (CTA)'
-          - $ref: '#/components/messages/SET_SUPPORT_INFO (CTA)'
+          - $ref: '#/components/messages/GET_SUPPORT_INFO (CTA)'
 
     publish:
       description: Send messeges to the controller
@@ -134,7 +134,7 @@ components:
               location_lat:
               location_lon:
 
-    SET_SUPPORT_INFO (CTA):
+    GET_SUPPORT_INFO (CTA):
       summary: Event for getting debug info about endpoint.
       payload:
         $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
@@ -486,7 +486,7 @@ components:
           type: string
         type:
           type: string
-          const: SET_SUPPORT_INFO
+          const: GET_SUPPORT_INFO
         data:
           type: object
 
