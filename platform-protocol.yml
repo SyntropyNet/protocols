@@ -60,6 +60,7 @@ channels:
           - $ref: '#/components/messages/AUTO_PING_ATC'
           - $ref: '#/components/messages/NETWORK_STATISTICS_ATC'
           - $ref: '#/components/messages/SERVICE_ROUTE_CHANGE_ATC'
+          - $ref: '#/components/messages/SERVICE_STATUS_ATC'
           - $ref: '#/components/messages/LOGGER_ATC'
           - $ref: '#/components/messages/SERVICE_INFO_ATC'
           - $ref: '#/components/messages/ERRORS_ATC'
@@ -305,8 +306,8 @@ components:
                     tx_bytes: 888380
                     latency_ms:
                     packet_loss: 1
-                    rx_speed_bps: 0
-                    tx_speed_bps: 0.000022794318546905317
+                    rx_speed_bps: 354
+                    tx_speed_bps: 553
               - ifname: SYNTROPY_SDN1
                 peers:
                   - connection_id: 3244
@@ -362,16 +363,10 @@ components:
                 value:
                   - DISK_PRESSURE
 
-    SERVICE_STATUS:
+    SERVICE_STATUS_ATC:
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
-        $ref: '#/components/schemas/wg_route_status'
-      examples:
-        - payload:
-            connectionID: 8628615390848610000
-            event: systemStatus
-            status: online
-            version: 1.0.0
+        $ref: '#/components/schemas/service_status'
 
   schemas:
     GET_AUTO_PING_CTA:
@@ -662,6 +657,8 @@ components:
             required:
               - connection_id
             properties:
+              prev_connection_id:
+                $ref: '#/components/schemas/connection_id'
               connection_id:
                 $ref: '#/components/schemas/connection_id'
 
@@ -960,7 +957,7 @@ components:
           agent_container_ports:
             $ref: '#/components/schemas/service_ports'
 
-    wg_route_status:
+    service_status:
       type: object
       description: Status after adding route to host routing table.
       properties:
