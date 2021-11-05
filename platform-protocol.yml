@@ -41,7 +41,7 @@ channels:
       description: Receive messages from the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO (CTA)'
+          - $ref: '#/components/messages/GET_INIT_INFO (CTA)'
           - $ref: '#/components/messages/SET_CONFIG_INFO (CTA)'
           - $ref: '#/components/messages/SET_AUTO_PING (CTA)'
           - $ref: '#/components/messages/SET_PEER_CONF (CTA)'
@@ -51,7 +51,7 @@ channels:
       description: Send messeges to the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO (ATC)'
+          - $ref: '#/components/messages/INIT_INFO (ATC)'
           - $ref: '#/components/messages/CONFIG_INFO (ATC)'
           - $ref: '#/components/messages/AUTO_PING (ATC)'
           - $ref: '#/components/messages/NETWORK_STATISTICS (ATC)'
@@ -94,29 +94,29 @@ components:
       payload:
         $ref: '#/components/schemas/AUTO_PING (ATC)'
 
-    GET_INFO (CTA):
+    GET_INIT_INFO (CTA):
       summary: Event for getting essential info about endpoint.
       description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
       payload:
-        $ref: '#/components/schemas/GET_INFO (CTA)'
+        $ref: '#/components/schemas/GET_INIT_INFO (CTA)'
       x-response:
-        $ref: '#/components/schemas/GET_INFO (ATC)'
+        $ref: '#/components/schemas/INIT_INFO (ATC)'
       examples:
         - payload:
             id: nEsBfD773UlafZ12
-            type: GET_INFO
+            type: GET_INIT_INFO
             data: {}
 
-    GET_INFO (ATC):
+    INIT_INFO (ATC):
       summary: Event for getting essential info about endpoint.
       description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
       payload:
-        $ref: '#/components/schemas/GET_INFO (ATC)'
+        $ref: '#/components/schemas/INIT_INFO (ATC)'
       examples:
         - payload:
             id: 4QpCCN4NDhwAGi1X
             executed_at: '2021-09-14T23:21:50.631912'
-            type: GET_INFO
+            type: INIT_INFO
             data:
               external_ip: 80.208.227.130
               network_info:
@@ -406,7 +406,7 @@ components:
                 type: number
 
 
-    GET_INFO (CTA):
+    GET_INIT_INFO (CTA):
       type: object
       required:
         - id
@@ -416,12 +416,12 @@ components:
           type: string
         type:
           type: string
-          const: GET_INFO
+          const: GET_INIT_INFO
         data:
           type: object
 
 
-    GET_INFO (ATC):
+    INIT_INFO (ATC):
       type: object
       required:
         - id
@@ -434,7 +434,7 @@ components:
           type: string
         type:
           type: string
-          const: GET_INFO
+          const: INIT_INFO
         data:
           type: object
           properties:
