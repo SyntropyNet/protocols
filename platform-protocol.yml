@@ -16,10 +16,6 @@ info:
       {
         "Authorization": "AGENT_TOKEN",
         "X-DeviceId": "Unique device ID.",
-        "X-DeviceName": "User friendly human readable device name.",
-        "X-DeviceIp": "Host machine public ip",
-        "X-AgentType": "'Linux' | 'macOS' | 'Windows'",
-        "X-AgentVersion": "Agent software version. Semantic Versioning (x.x.x)",
       }
       ```
 servers:
@@ -45,34 +41,34 @@ channels:
       description: Receive messages from the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO_CTA'
-          - $ref: '#/components/messages/GET_CONFIG_INFO_CTA'
-          - $ref: '#/components/messages/GET_AUTO_PING_CTA'
-          - $ref: '#/components/messages/GET_PEER_CONF_CTA'
-          - $ref: '#/components/messages/GET_SUPPORT_INFO_CTA'
+          - $ref: '#/components/messages/GET_INFO (CTA)'
+          - $ref: '#/components/messages/GET_CONFIG_INFO (CTA)'
+          - $ref: '#/components/messages/GET_AUTO_PING (CTA)'
+          - $ref: '#/components/messages/GET_PEER_CONF (CTA)'
+          - $ref: '#/components/messages/GET_SUPPORT_INFO (CTA)'
 
     publish:
       description: Send messeges to the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/GET_INFO_ATC'
-          - $ref: '#/components/messages/CONFIG_INFO_ATC'
-          - $ref: '#/components/messages/AUTO_PING_ATC'
-          - $ref: '#/components/messages/NETWORK_STATISTICS_ATC'
-          - $ref: '#/components/messages/SERVICE_ROUTE_CHANGE_ATC'
-          - $ref: '#/components/messages/SERVICE_STATUS_ATC'
-          - $ref: '#/components/messages/LOGGER_ATC'
-          - $ref: '#/components/messages/SERVICE_INFO_ATC'
-          - $ref: '#/components/messages/ERRORS_ATC'
-          - $ref: '#/components/messages/SUPPORT_INFO_ATC'
+          - $ref: '#/components/messages/GET_INFO (ATC)'
+          - $ref: '#/components/messages/CONFIG_INFO (ATC)'
+          - $ref: '#/components/messages/AUTO_PING (ATC)'
+          - $ref: '#/components/messages/NETWORK_STATISTICS (ATC)'
+          - $ref: '#/components/messages/SERVICE_ROUTE_CHANGE (ATC)'
+          - $ref: '#/components/messages/SERVICE_STATUS (ATC)'
+          - $ref: '#/components/messages/LOGGER (ATC)'
+          - $ref: '#/components/messages/SERVICE_INFO (ATC)'
+          - $ref: '#/components/messages/ERRORS (ATC)'
+          - $ref: '#/components/messages/SUPPORT_INFO (ATC)'
 
 
 components:
   messages:
-    GET_AUTO_PING_CTA:
+    GET_AUTO_PING (CTA):
       description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
       payload:
-        $ref: '#/components/schemas/GET_AUTO_PING_CTA'
+        $ref: '#/components/schemas/GET_AUTO_PING (CTA)'
       examples:
         - payload:
             id: nEsBfD773UlafZnf
@@ -93,29 +89,29 @@ components:
               interval: 60
               response_limit: 5
 
-    AUTO_PING_ATC:
+    AUTO_PING (ATC):
       description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
       payload:
-        $ref: '#/components/schemas/AUTO_PING_ATC'
+        $ref: '#/components/schemas/AUTO_PING (ATC)'
 
-    GET_INFO_CTA:
+    GET_INFO (CTA):
       summary: Event for getting essential info about endpoint.
       description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
       payload:
-        $ref: '#/components/schemas/GET_INFO_CTA'
+        $ref: '#/components/schemas/GET_INFO (CTA)'
       x-response:
-        $ref: '#/components/schemas/GET_INFO_ATC'
+        $ref: '#/components/schemas/GET_INFO (ATC)'
       examples:
         - payload:
             id: nEsBfD773UlafZ12
             type: GET_INFO
             data: {}
 
-    GET_INFO_ATC:
+    GET_INFO (ATC):
       summary: Event for getting essential info about endpoint.
       description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
       payload:
-        $ref: '#/components/schemas/GET_INFO_ATC'
+        $ref: '#/components/schemas/GET_INFO (ATC)'
       examples:
         - payload:
             id: 4QpCCN4NDhwAGi1X
@@ -138,28 +134,28 @@ components:
               location_lat:
               location_lon:
 
-    GET_SUPPORT_INFO_CTA:
+    GET_SUPPORT_INFO (CTA):
       summary: Event for getting debug info about endpoint.
       payload:
-        $ref: '#/components/schemas/SUPPORT_INFO_ATC'
+        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
       examples:
         - payload:
             id: nEsBfD773UlafZ12
             type: SUPPORT_INFO
             data: {}
 
-    SUPPORT_INFO_ATC:
+    SUPPORT_INFO (ATC):
       summary: Event for getting debug info about endpoint.
       payload:
-        $ref: '#/components/schemas/SUPPORT_INFO_CTA'
+        $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
 
 
-    GET_CONFIG_INFO_CTA:
+    GET_CONFIG_INFO (CTA):
       description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
       payload:
         $ref: '#/components/schemas/GET_CONFIG_INFO'
       x-response:
-        $ref: '#/components/messages/CONFIG_INFO_ATC'
+        $ref: '#/components/messages/CONFIG_INFO (ATC)'
       examples:
         - payload:
             id: Asa05ML1102HSJVl
@@ -196,16 +192,16 @@ components:
                           - ADD
                           - DEL
 
-    CONFIG_INFO_ATC:
-      summary: CONFIG_INFO_ATC is a response to GET_CONFIG_INFO_CTA message
+    CONFIG_INFO (ATC):
+      summary: CONFIG_INFO (ATC) is a response to GET_CONFIG_INFO (CTA) message
       description: Platform agents sends this event to controller when it wants to update configuration data, i.e. to change configured interface public key due to unrecoverable loss of data on platform agents side.
       payload:
-        $ref: '#/components/schemas/CONFIG_INFO_ATC'
+        $ref: '#/components/schemas/CONFIG_INFO (ATC)'
       examples:
         - payload:
             id: 0OEqrxBRyAExh04b
             executed_at: "2021-08-04T11:18:38.319935"
-            type: CONFIG_INFO_ATC
+            type: CONFIG_INFO (ATC)
             data:
               -
                 fn: create_interface
@@ -236,10 +232,10 @@ components:
                   listen_port: 49154
                   ifname: SYNTROPY_SDN3
                   internal_ip: 10.69.14.100
-    GET_PEER_CONF_CTA:
+    GET_PEER_CONF (CTA):
       description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
       payload:
-        $ref: '#/components/schemas/GET_PEER_CONF_CTA'
+        $ref: '#/components/schemas/GET_PEER_CONF (CTA)'
       examples:
         - payload:
             id: Asa05ML1102HSJVl
@@ -271,7 +267,7 @@ components:
                     agent_service_subnet_ip: 172.20.0.0/26
         - payload:
             id: Asa05ML1102HSJVl
-            type: GET_PEER_CONF_CTA
+            type: GET_PEER_CONF (CTA)
             data:
               -
                 fn: remove_peer
@@ -287,15 +283,15 @@ components:
                 allowed_ips:
                  - 10.69.10.86/32
 
-    NETWORK_STATISTICS_ATC:
+    NETWORK_STATISTICS (ATC):
       description: Platform agent periodically sends wireguard configured interfaces peers bandwith data (bandwith of one particular peer via particular interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
       payload:
-        $ref: '#/components/schemas/NETWORK_STATISTICS_ATC'
+        $ref: '#/components/schemas/NETWORK_STATISTICS (ATC)'
       examples:
         - payload:
             id: "-"
             executed_at: "2021-09-08T12:22:01.248033"
-            type: NETWORK_STATISTICS_ATC
+            type: NETWORK_STATISTICS (ATC)
             data:
               - ifname: SYNTROPY_PUBLIC
                 peers:
@@ -320,30 +316,30 @@ components:
                     tx_speed_bps: 4545
                     
 
-    SERVICE_ROUTE_CHANGE_ATC:
+    SERVICE_ROUTE_CHANGE (ATC):
       description: Platform agent sends information when current ACTIVE route changes.
       payload:
-        $ref: '#/components/schemas/SERVICE_ROUTE_CHANGE_ATC'
+        $ref: '#/components/schemas/SERVICE_ROUTE_CHANGE (ATC)'
 
-    LOGGER_ATC:
+    LOGGER (ATC):
       description: Platform agent sends nicely formatted log data to controller. This data is later redirected to platform agents index for users to consume.
       payload:
-        $ref: '#/components/schemas/LOGGER_ATC'
+        $ref: '#/components/schemas/LOGGER (ATC)'
 
-    SERVICE_INFO_ATC:
+    SERVICE_INFO (ATC):
       description: This event is triggered when platform agent network changes. Platform agent sends entire list of available services and their metadata.
       payload:
-        $ref: '#/components/schemas/SERVICE_INFO_ATC'
+        $ref: '#/components/schemas/SERVICE_INFO (ATC)'
 
-    ERRORS_ATC:
+    ERRORS (ATC):
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
-        $ref: '#/components/schemas/ERRORS_ATC'
+        $ref: '#/components/schemas/ERRORS (ATC)'
       examples:
         - payload:
             id: "-"
             executed_at: "2021-09-08T12:22:01.248033"
-            type: ERRORS_ATC
+            type: ERRORS (ATC)
             data:
               - key: ROUTES
                 value:
@@ -363,13 +359,13 @@ components:
                 value:
                   - DISK_PRESSURE
 
-    SERVICE_STATUS_ATC:
+    SERVICE_STATUS (ATC):
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
         $ref: '#/components/schemas/service_status'
 
   schemas:
-    GET_AUTO_PING_CTA:
+    GET_AUTO_PING (CTA):
       type: object
       properties:
         type:
@@ -386,7 +382,7 @@ components:
           - data
 
 
-    AUTO_PING_ATC:
+    AUTO_PING (ATC):
       type: object
       properties:
         type:
@@ -410,7 +406,7 @@ components:
                 type: number
 
 
-    GET_INFO_CTA:
+    GET_INFO (CTA):
       type: object
       required:
         - id
@@ -425,7 +421,7 @@ components:
           type: object
 
 
-    GET_INFO_ATC:
+    GET_INFO (ATC):
       type: object
       required:
         - id
@@ -480,7 +476,7 @@ components:
                   default: False
                   description: "Status whether services will be connected by default or not."
 
-    SUPPORT_INFO_CTA:
+    SUPPORT_INFO (CTA):
       type: object
       required:
         - id
@@ -495,7 +491,7 @@ components:
           type: object
 
 
-    SUPPORT_INFO_ATC:
+    SUPPORT_INFO (ATC):
       type: object
       required:
         - id
@@ -540,9 +536,9 @@ components:
                 - $ref: '#/components/schemas/interface'
 
 
-    CONFIG_INFO_ATC:
+    CONFIG_INFO (ATC):
       type: object
-      description: Need to send only if interfaces updated compared to GET_CONFIG_INFO_CTA.
+      description: Need to send only if interfaces updated compared to GET_CONFIG_INFO (CTA).
       required:
         - id
         - type
@@ -556,7 +552,7 @@ components:
           const: CONFIG_INFO
         data:
           type: object
-          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from GET_CONFIG_INFO_CTA.
+          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from GET_CONFIG_INFO (CTA).
           properties:
             interfaces:
               type: array
@@ -564,7 +560,7 @@ components:
                 - $ref: '#/components/schemas/interface'
 
 
-    GET_PEER_CONF_CTA:
+    GET_PEER_CONF (CTA):
       type: object
       required:
         - id
@@ -582,7 +578,7 @@ components:
           items:
             - $ref: '#/components/schemas/peer'
 
-    NETWORK_STATISTICS_ATC:
+    NETWORK_STATISTICS (ATC):
       type: object
       required:
         - id
@@ -596,7 +592,7 @@ components:
           type: string
         type:
           type: string
-          const: NETWORK_STATISTICS_ATC
+          const: NETWORK_STATISTICS (ATC)
         data:
           type: array
           description: List of interfaces with analytic peers data.
@@ -634,7 +630,7 @@ components:
                     rx_speed_bps:
                       $ref: '#/components/schemas/rx_speed_bps'
 
-    SERVICE_ROUTE_CHANGE_ATC:
+    SERVICE_ROUTE_CHANGE (ATC):
       type: object
       required:
         - id
@@ -648,7 +644,7 @@ components:
           type: string
         type:
           type: string
-          const: SERVICE_ROUTE_CHANGE_ATC
+          const: SERVICE_ROUTE_CHANGE (ATC)
         data:
           type: array
           description: List of peers connections that became active after rerouting event.
@@ -663,7 +659,7 @@ components:
                 $ref: '#/components/schemas/connection_id'
 
 
-    LOGGER_ATC:
+    LOGGER (ATC):
       type: object
       required:
         - id
@@ -677,7 +673,7 @@ components:
           type: string
         type:
           type: string
-          const: LOGGER_ATC
+          const: LOGGER (ATC)
         data:
           type: object
           required:
@@ -690,7 +686,7 @@ components:
               type: string
 
 
-    SERVICE_INFO_ATC:
+    SERVICE_INFO (ATC):
       type: object
       required:
         - id
@@ -704,7 +700,7 @@ components:
           type: string
         type:
           type: string
-          const: SERVICE_INFO_ATC
+          const: SERVICE_INFO (ATC)
         data:
           type: array
           items:
@@ -728,7 +724,7 @@ components:
                 $ref: '#/components/schemas/service_ports'
 
 
-    ERRORS_ATC:
+    ERRORS (ATC):
       type: object
       required:
         - id
@@ -742,7 +738,7 @@ components:
           type: string
         type:
           type: string
-          const: ERRORS_ATC
+          const: ERRORS (ATC)
         data:
           type: array
           items:
