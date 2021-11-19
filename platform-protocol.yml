@@ -61,7 +61,6 @@ channels:
           - $ref: '#/components/messages/SERVICE_STATUS (ATC)'
           - $ref: '#/components/messages/LOGGER (ATC)'
           - $ref: '#/components/messages/SERVICE_INFO (ATC)'
-          - $ref: '#/components/messages/ERRORS (ATC)'
           - $ref: '#/components/messages/SUPPORT_INFO (ATC)'
 
 
@@ -210,7 +209,7 @@ components:
                 data:
                   public_key: O39YgbELLp80K2G5D/xZjcM0gZcRURW1LCWNc5FaO3I=
                   listen_port: 49152
-                  ifname: SYNTROPY_PUBLIC
+                  ifname: 0
                   internal_ip: 10.69.14.97
                   status: 0
               -
@@ -218,21 +217,21 @@ components:
                 data:
                   public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
                   listen_port: 49156
-                  ifname: SYNTROPY_SDN1
+                  ifname: 1
                   internal_ip: 10.69.14.98
               -
                 fn: create_interface
                 data:
                   public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
                   listen_port: 49153
-                  ifname: SYNTROPY_SDN2
+                  ifname: 2
                   internal_ip: 10.69.14.99
               -
                 fn: create_interface
                 data:
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
                   listen_port: 49154
-                  ifname: SYNTROPY_SDN3
+                  ifname: 3
                   internal_ip: 10.69.14.100
     SET_PEER_CONF (CTA):
       description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
@@ -304,8 +303,8 @@ components:
                     tx_bytes: 888380
                     latency_ms:
                     packet_loss: 1
-                    rx_speed_bps: 354
-                    tx_speed_bps: 553
+                    rx_bps: 354
+                    tx_bps: 553
               - ifname: SYNTROPY_SDN1
                 peers:
                   - connection_id: 3244
@@ -314,8 +313,8 @@ components:
                     tx_bytes: 417812
                     latency_ms: 188.1084442138672
                     packet_loss: 0
-                    rx_speed_bps: 3453
-                    tx_speed_bps: 4545
+                    rx_bps: 3453
+                    tx_bps: 4545
                     
 
     SERVICE_ROUTE_CHANGE (ATC):
@@ -374,11 +373,19 @@ components:
           type: string
           const: SET_AUTO_PING
         data:
-          type: array
-          description: Array of ips.
-          items:
-            type: string
-            description: Array of ip addresses agent should ping.
+          properties:
+            ips:
+              type: array
+              description: Array of ips.
+              items:
+                type: string
+                description: Array of ip addresses agent should ping.
+            interval:
+              $ref: '#/components/schemas/interval'
+            response_limit:
+              $ref: '#/components/schemas/response_limit'
+
+
       required:
           - type
           - data
@@ -627,10 +634,10 @@ components:
                       $ref: '#/components/schemas/rx_bytes'
                     tx_bytes:
                       $ref: '#/components/schemas/tx_bytes'
-                    tx_speed_bps:
-                      $ref: '#/components/schemas/tx_speed_bps'
-                    rx_speed_bps:
-                      $ref: '#/components/schemas/rx_speed_bps'
+                    tx_bps:
+                      $ref: '#/components/schemas/tx_bps'
+                    rx_bps:
+                      $ref: '#/components/schemas/rx_bps'
 
     SERVICE_ROUTE_CHANGE (ATC):
       type: object
@@ -657,6 +664,7 @@ components:
             properties:
               prev_connection_id:
                 $ref: '#/components/schemas/connection_id'
+                default: 0
               connection_id:
                 $ref: '#/components/schemas/connection_id'
 
@@ -683,7 +691,7 @@ components:
             - message
           properties:
             severity:
-              type: string
+              $ref: '#/components/schemas/severity'
             message:
               type: string
 
@@ -825,8 +833,8 @@ components:
         - internal_ip
         - name
       properties:
-        name:
-          $ref: '#/components/schemas/int_name'
+        index:
+          $ref: '#/components/schemas/index'
         internal_ip:
           $ref: '#/components/schemas/internal_ip'
         public_key:
@@ -1094,14 +1102,8 @@ components:
     public_key:
       type: string
 
-    int_name:
-      type: string
-      enum:
-        - PUBLIC
-        - SDN1
-        - SDN2
-        - SDN3
-
+    index:
+      type: integer
 
     internal_ip:
       type: string
@@ -1148,7 +1150,15 @@ components:
         - DOCKER
         - KUBERNETES
         - HOST
-        -
+
+    severity:
+      type: string
+      enum:
+        - DEBUG
+        - INFO
+        - WARNING
+        - ERROR
+
     allowed_ips:
       type: array
       description: List of ips.
@@ -1165,16 +1175,22 @@ components:
     tx_bytes:
       type: integer
 
-    tx_speed_bps:
+    tx_bps:
       type: number
 
-    rx_speed_bps:
+    rx_bps:
       type: number
 
     connection_id:
       type: integer
 
     connection_group_id:
+      type: integer
+
+    interval:
+      type: integer
+
+    response_limit:
       type: integer
 
     subnets:
