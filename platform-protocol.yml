@@ -860,7 +860,7 @@ components:
         - gw_ipv4
       properties:
         index:
-          type: string
+          $ref: '#/components/schemas/index'
         public_key:
           $ref: '#/components/schemas/public_key'
         private_ip:
