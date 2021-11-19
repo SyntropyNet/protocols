@@ -139,6 +139,8 @@ components:
       summary: Event for getting debug info about endpoint.
       payload:
         $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
+      x-response:
+        $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
       examples:
         - payload:
             id: nEsBfD773UlafZ12
@@ -149,6 +151,8 @@ components:
       summary: Event for getting debug info about endpoint.
       payload:
         $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
+      x-response:
+        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
 
 
     SET_CONFIG (CTA):
@@ -209,7 +213,7 @@ components:
                 data:
                   public_key: O39YgbELLp80K2G5D/xZjcM0gZcRURW1LCWNc5FaO3I=
                   listen_port: 49152
-                  ifname: 0
+                  index: 0
                   internal_ip: 10.69.14.97
                   status: 0
               -
@@ -217,21 +221,21 @@ components:
                 data:
                   public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
                   listen_port: 49156
-                  ifname: 1
+                  index: 1
                   internal_ip: 10.69.14.98
               -
                 fn: create_interface
                 data:
                   public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
                   listen_port: 49153
-                  ifname: 2
+                  index: 2
                   internal_ip: 10.69.14.99
               -
                 fn: create_interface
                 data:
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
                   listen_port: 49154
-                  ifname: 3
+                  index: 3
                   internal_ip: 10.69.14.100
     SET_PEER_CONF (CTA):
       description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
@@ -249,7 +253,7 @@ components:
                     - 10.69.10.93/32
                   endpoint_ipv4: 94.251.23.158
                   endpoint_port: 0
-                  ifname: SYNTROPY_PUBLIC
+                  index: SYNTROPY_PUBLIC
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                   gw_ipv4: 10.69.0.47
                 metadata:
@@ -273,13 +277,13 @@ components:
               -
                 fn: remove_peer
                 args:
-                  ifname: SYNTROPY_PUBLIC
+                  index: SYNTROPY_PUBLIC
                   public_key: KaCq7nTViC9rhPc21ky92H7iTldGF76m3hrcSR4UdUc=
                   allowed_ips:
                     - 10.69.10.86/32
               -
                 fn: remove_peer
-                ifname: SYNTROPY_SDN1
+                index: SYNTROPY_SDN1
                 public_key: AxB/JKQ9aPRgfEA5zI00jX4aZzfxz8LwTKrYaN0OkjI=
                 allowed_ips:
                  - 10.69.10.86/32
@@ -294,7 +298,7 @@ components:
             executed_at: "2021-09-08T12:22:01.248033"
             type: NETWORK_STATISTICS (ATC)
             data:
-              - ifname: SYNTROPY_PUBLIC
+              - index: SYNTROPY_PUBLIC
                 peers:
                   - connection_id: 2344
                     connection_group_id: 344
@@ -305,7 +309,7 @@ components:
                     packet_loss: 1
                     rx_bps: 354
                     tx_bps: 553
-              - ifname: SYNTROPY_SDN1
+              - index: SYNTROPY_SDN1
                 peers:
                   - connection_id: 3244
                     connection_group_id: 345
@@ -608,9 +612,9 @@ components:
           items:
             type: object
             required:
-              - ifname
+              - index
             properties:
-              ifname:
+              index:
                 type: string
               peers:
                 type: array
@@ -785,9 +789,9 @@ components:
         args:
           type: object
           required:
-            - ifname
+            - index
           properties:
-            ifname:
+            index:
               type: string
       description: Wireguard interface remove.
 
@@ -816,9 +820,9 @@ components:
         args:
           type: object
           required:
-            - ifname
+            - index
           properties:
-            ifname:
+            index:
               type: string
             public_key:
               $ref: '#/components/schemas/public_key'
@@ -850,12 +854,12 @@ components:
     peer:
       type: object
       required:
-        - ifname
+        - index
         - public_key
         - allowed_ips
         - gw_ipv4
       properties:
-        ifname:
+        index:
           type: string
         public_key:
           $ref: '#/components/schemas/public_key'
