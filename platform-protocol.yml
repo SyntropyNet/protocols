@@ -67,7 +67,7 @@ channels:
 components:
   messages:
     SET_AUTO_PING (CTA):
-      description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
+      description: Controller sets the list of host to be pinged (ICMP) periodically at configured interval (in seconds). The first response should be processed ASAP.
       payload:
         $ref: '#/components/schemas/SET_AUTO_PING (CTA)'
       examples:
@@ -91,13 +91,13 @@ components:
               response_limit: 5
 
     AUTO_PING (ATC):
-      description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
+      description: Response results count should be limited to `response_limit` best results, sorted by latency.
       payload:
         $ref: '#/components/schemas/AUTO_PING (ATC)'
 
     GET_INIT_INFO (CTA):
       summary: Event for getting essential info about endpoint.
-      description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
+      description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility. No further communication will happen until response is sent.
       payload:
         $ref: '#/components/schemas/GET_INIT_INFO (CTA)'
       x-response:
@@ -373,11 +373,18 @@ components:
     SET_AUTO_PING (CTA):
       type: object
       properties:
+        required:
+          - type
+          - data
         type:
           type: string
           const: SET_AUTO_PING
         data:
           properties:
+            required:
+              - ips
+              - interval
+              - response_limit
             ips:
               type: array
               description: Array of ips.
@@ -386,18 +393,19 @@ components:
                 description: Array of ip addresses agent should ping.
             interval:
               $ref: '#/components/schemas/interval'
+              description: Interval in seconds to ping hosts.
             response_limit:
               $ref: '#/components/schemas/response_limit'
-
-
-      required:
-          - type
-          - data
+              description: Count of best results to send in response.
 
 
     AUTO_PING (ATC):
       type: object
       properties:
+        required:
+          - type
+          - executed_at
+          - data
         type:
           type: string
           const: AUTO_PING
@@ -410,11 +418,15 @@ components:
             description: Array of ip addresses should ping.
             type: object
             properties:
+              required:
+                - ip
+                - latency_ms
+                - packet_loss
               ip:
                 type: string
                 description: Ip address in string format.
               latency_ms:
-                type: integer
+                type: number
               packet_loss:
                 type: number
 
