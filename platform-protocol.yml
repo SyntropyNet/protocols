@@ -138,9 +138,9 @@ components:
     GET_SUPPORT_INFO (CTA):
       summary: Event for getting debug info about endpoint.
       payload:
-        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
-      x-response:
         $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
+      x-response:
+        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
       examples:
         - payload:
             id: nEsBfD773UlafZ12
@@ -372,19 +372,19 @@ components:
   schemas:
     SET_AUTO_PING (CTA):
       type: object
+      required:
+        - type
+        - data
       properties:
-        required:
-          - type
-          - data
         type:
           type: string
           const: SET_AUTO_PING
         data:
+          required:
+            - ips
+            - interval
+            - response_limit
           properties:
-            required:
-              - ips
-              - interval
-              - response_limit
             ips:
               type: array
               description: Array of ips.
@@ -401,11 +401,11 @@ components:
 
     AUTO_PING (ATC):
       type: object
+      required:
+        - type
+        - executed_at
+        - data
       properties:
-        required:
-          - type
-          - executed_at
-          - data
         type:
           type: string
           const: AUTO_PING
@@ -417,16 +417,16 @@ components:
           items:
             description: Array of ip addresses should ping.
             type: object
+            required:
+              - ip
+              - latency_ms
+              - packet_loss
             properties:
-              required:
-                - ip
-                - latency_ms
-                - packet_loss
               ip:
                 type: string
                 description: Ip address in string format.
               latency_ms:
-                type: number
+                $ref: '#/components/schemas/latency_ms'
               packet_loss:
                 type: number
 
@@ -474,7 +474,8 @@ components:
                   name:
                     type: string
                   provider:
-                    type: string
+                    type: integer
+                    description: Choose provider from https://docs.syntropystack.com/docs/syntropy-agent-variables#syntropy-provider
                   tags:
                     type: array
                     description: Array of tags.
@@ -521,6 +522,7 @@ components:
       required:
         - id
         - type
+        - data
       properties:
         id:
           type: string
@@ -601,7 +603,15 @@ components:
           type: array
           description: List of wireguard configration commands
           items:
-            - $ref: '#/components/schemas/peer'
+            type: object
+            required:
+              - action
+              - type
+            properties:
+              action:
+                $ref: '#/components/schemas/peer_action'
+              type:
+                $ref: '#/components/schemas/peer'
 
     NETWORK_STATISTICS (ATC):
       type: object
@@ -609,6 +619,7 @@ components:
         - id
         - type
         - data
+        - executed_at
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -625,9 +636,10 @@ components:
             type: object
             required:
               - index
+              - peers
             properties:
               index:
-                type: string
+                $ref: '#/components/schemas/index'
               peers:
                 type: array
                 items:
@@ -691,6 +703,7 @@ components:
         - id
         - type
         - data
+        - executed_at
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -732,9 +745,9 @@ components:
           items:
             type: object
             required:
-              - docker_network_id
-              - docker_network_name
-              - docker_network_subnets
+              - name
+              - type
+              - ip
             properties:
               name:
                 type: string
@@ -804,7 +817,7 @@ components:
             - index
           properties:
             index:
-              type: string
+              $ref: '#/components/schemas/index'
       description: Wireguard interface remove.
 
     add_peer:
@@ -835,7 +848,7 @@ components:
             - index
           properties:
             index:
-              type: string
+              $ref: '#/components/schemas/index'
             public_key:
               $ref: '#/components/schemas/public_key'
             allowed_ips:
@@ -847,7 +860,7 @@ components:
       type: object
       required:
         - internal_ip
-        - name
+        - index
       properties:
         index:
           $ref: '#/components/schemas/index'
@@ -885,8 +898,6 @@ components:
           $ref: '#/components/schemas/connection_id'
         connection_group_id:
           $ref: '#/components/schemas/connection_group_id'
-        agent_id:
-          type: string
         services:
           type: array
           items:
@@ -900,8 +911,6 @@ components:
                 $ref: '#/components/schemas/service_ports'
               agent_service_udp_ports:
                 $ref: '#/components/schemas/udp_ports'
-        action:
-          $ref: '#/components/schemas/peer_action'
       description: Peer fields.
 
     interface_metadata:
@@ -982,6 +991,10 @@ components:
     service_status:
       type: object
       description: Status after adding route to host routing table.
+      required:
+        - id
+        - type
+        - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -1084,6 +1097,9 @@ components:
 
     support_info:
       description: Status after creating interface
+      required:
+        - key
+        - value
       properties:
         key:
           type: string
@@ -1128,7 +1144,7 @@ components:
       type: string
 
     latency_ms:
-      type: string
+      type: number
 
     packet_loss:
       type: number
