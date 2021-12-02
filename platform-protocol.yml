@@ -336,34 +336,6 @@ components:
       payload:
         $ref: '#/components/schemas/SERVICE_INFO (ATC)'
 
-    ERRORS (ATC):
-      description: Platform agent sends information about route addition. Confirms successes and failures.
-      payload:
-        $ref: '#/components/schemas/ERRORS (ATC)'
-      examples:
-        - payload:
-            id: "-"
-            executed_at: "2021-09-08T12:22:01.248033"
-            type: ERRORS (ATC)
-            data:
-              - key: ROUTES
-                value:
-                  - connection_group_id: '1001'
-                    ip: 167.0.15.1
-                    errors:
-                      - CONFLICT
-                  - connection_group_id: '1001'
-                    ip: 167.0.15.2
-                    errors: [ ]
-              - key: INTERFACES
-                value:
-                  - ip: 172.69.0.10
-                    errors:
-                      - WG_NOT_FOUND
-              - key: SYSINFO
-                value:
-                  - DISK_PRESSURE
-
     SERVICE_STATUS (ATC):
       description: Platform agent sends information about route addition. Confirms successes and failures.
       payload:
@@ -761,31 +733,6 @@ components:
                   type: string
               ports:
                 $ref: '#/components/schemas/service_ports'
-
-
-    ERRORS (ATC):
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-          default: "-"
-        executed_at:
-          type: string
-        type:
-          type: string
-          const: ERRORS (ATC)
-        data:
-          type: array
-          items:
-            oneOf:
-              - $ref: '#/components/schemas/new_route_statuses'
-              - $ref: '#/components/schemas/interface_statuses'
-              - $ref: '#/components/schemas/sys_info_statuses'
-
 
     create_interface:
       type: object
