@@ -101,6 +101,8 @@ components:
     AUTO_PING_RES:
       type: object
       properties:
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: AUTO_PING
@@ -150,6 +152,8 @@ components:
         id:
           $ref: '#/components/schemas/msg_id'
           default: "-"
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: LOGGER
@@ -277,3 +281,7 @@ components:
 
     port:
       type: number
+
+    executed_at:
+      type: string
+      description: Datetime ISO8601 format
