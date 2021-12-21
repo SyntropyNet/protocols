@@ -85,11 +85,16 @@ components:
           type: string
           const: AUTO_PING
         data:
-          type: array
-          description: Array of ips.
-          items:
-            type: string
-            description: Array of ip addresses agent should ping.
+          type: object
+          properties:
+            hosts:
+              type: array
+              description: Array of ips.
+              items:
+                  type: string
+
+            interval:
+              type: integer
       required:
           - type
           - data
@@ -100,19 +105,17 @@ components:
           type: string
           const: AUTO_PING
         data:
-          type: array
-          description: Array of ips.
-          items:
-            description: Array of ip addresses should ping.
-            type: object
-            properties:
-              ip:
-                type: string
-                description: Ip address in string format.
-              latency_ms:
-                type: integer
-              packet_loss:
-                type: number
+          description: Object of ip addresses objects that has ping information.
+          type: object
+          properties:
+            ip:
+              type: object
+              description: Object containing ping information
+              properties:
+                latency_ms:
+                  type: integer
+                packet_loss:
+                  type: number
     NFTABLES:
       type: object
       required:
