@@ -46,6 +46,7 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/GET_INFO'
+          - $ref: '#/components/messages/SET_SETTINGS'
           - $ref: '#/components/messages/CONFIG_INFO'
           - $ref: '#/components/messages/AUTO_PING'
           - $ref: '#/components/messages/WG_CONF'
@@ -106,6 +107,21 @@ components:
             id: nEsBfD773UlafZ12
             type: GET_INFO
             data: {}
+
+
+    SET_SETTINGS:
+      summary: Event for settings thresholds.
+      payload:
+        $ref: '#/components/schemas/SET_SETTINGS_REQ'
+      examples:
+        - payload:
+            id: 77B5awghKXGxyyZu
+            type: SET_SETTINGS
+            data:
+              rerouting_threshold:
+                latency_diff: 33
+                latency_ratio: 2.0300000000000002
+
 
     CONFIG_INFO:
       description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
@@ -466,6 +482,24 @@ components:
       required:
         - id
         - type
+    SET_SETTINGS_REQ:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          const: SET_SETTINGS
+        data:
+          type: object
+          description: Settings.
+          properties:
+            rerouting_threshold:
+              $ref: '#/components/schemas/rerouting_threshold'
+      required:
+          - type
+          - id
+          - data
 
     CONFIG_INFO_REQ:
       type: object
@@ -1075,6 +1109,14 @@ components:
         tcp:
           $ref: '#/components/schemas/tcp_ports'
 
+    rerouting_threshold:
+      type: object
+      description: Rerouting thresholds.
+      properties:
+        latency_ratio:
+          $ref: '#/components/schemas/ratio'
+        latency_diff:
+          $ref: '#/components/schemas/latency_ms'
 
     udp_ports:
       type: array
@@ -1099,7 +1141,10 @@ components:
       type: string
 
     latency_ms:
-      type: string
+      type: integer
+
+    ratio:
+      type: number
 
     packet_loss:
       type: number
