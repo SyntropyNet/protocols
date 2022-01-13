@@ -1,15 +1,19 @@
-asyncapi: 2.0.0
-
+asyncapi: 2.2.0
 info:
   title: Syntropy Websockets API
-  version: '1.0.0'
-  description: |
-    Syntropy WebSockets API allows to connect with Syntropy controller and get node configuration updates and return required info to controller.
+  version: 1.0.0
+  description: >
+    Syntropy WebSockets API allows to connect with Syntropy controller and get
+    node configuration updates and return required info to controller.
+
 
     ### General Rules
 
+
     - Agent version must be valid semver https://semver.org/.
+
     - All messages sent and received via WebSockets are encoded in JSON format
+
 
     ### HTTP request headers when connecting to controller websocket.
       ```
@@ -26,19 +30,21 @@ servers:
   prod:
     url: controller-prod-platform-agents.syntropystack.com
     protocol: wss
-    description: |
-      Always stable production server for agents . Authentication token has to be created at https://platform.syntropystack.com
+    description: >
+      Always stable production server for agents . Authentication token has to
+      be created at https://platform.syntropystack.com
   devel:
     url: controller-devel-platform-agents.syntropystack.com
     protocol: wss
-    description: |
-      Always stable Development server for agents. Authentication token has to be created at https://platform-devel.syntropystack.com
+    description: >
+      Always stable Development server for agents. Authentication token has to
+      be created at https://platform-devel.syntropystack.com
   sandbox:
     url: controller-sandbox-platform-agents.syntropystack.com
     protocol: wss
-    description: |
-      Sometimes Stable Sandbox server for agents. Authentication token has to be created at https://platform-sandbox.syntropystack.com
-
+    description: >
+      Sometimes Stable Sandbox server for agents. Authentication token has to be
+      created at https://platform-sandbox.syntropystack.com
 channels:
   /:
     subscribe:
@@ -50,7 +56,6 @@ channels:
           - $ref: '#/components/messages/CONFIG_INFO'
           - $ref: '#/components/messages/AUTO_PING'
           - $ref: '#/components/messages/WG_CONF'
-
     publish:
       description: Send messeges to the controller
       message:
@@ -65,12 +70,13 @@ channels:
           - $ref: '#/components/messages/CONTAINER_INFO'
           - $ref: '#/components/messages/HW_SERVICE_INFO'
           - $ref: '#/components/messages/KUBERNETES_SERVICE_INFO'
-
-
 components:
   messages:
     AUTO_PING:
-      description: Controller sets list of hosts for platform agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
+      description: >-
+        Controller sets list of hosts for platform agent to ping and repeat
+        interval in seconds. Platform agent respons periodically with pinging
+        information.
       payload:
         $ref: '#/components/schemas/AUTO_PING_REQ'
       x-response:
@@ -91,13 +97,17 @@ components:
             type: AUTO_PING
             data:
               hosts:
-                -
+                - null
               interval: 60
               response_limit: 5
-
     GET_INFO:
       summary: Event for getting essential info about endpoint.
-      description: Event is triggered when platform agent establishes connection with controller. Controller requests platform agent for agent's metadata such as its server provider, category, location, user specified tags, available services (entire list) in agent network. Controller accepts docker_* prefixed keys for compatibility.
+      description: >-
+        Event is triggered when platform agent establishes connection with
+        controller. Controller requests platform agent for agent's metadata such
+        as its server provider, category, location, user specified tags,
+        available services (entire list) in agent network. Controller accepts
+        docker_* prefixed keys for compatibility.
       payload:
         $ref: '#/components/schemas/GET_INFO_REQ'
       x-response:
@@ -107,8 +117,6 @@ components:
             id: nEsBfD773UlafZ12
             type: GET_INFO
             data: {}
-
-
     SET_SETTINGS:
       summary: Event for settings thresholds.
       payload:
@@ -121,10 +129,11 @@ components:
               rerouting_threshold:
                 latency_diff: 33
                 latency_ratio: 2.0300000000000002
-
-
     CONFIG_INFO:
-      description: Event is triggered when platform agent establishes connection with controller. Controller sends entire configuration dump to platform agent.
+      description: >-
+        Event is triggered when platform agent establishes connection with
+        controller. Controller sends entire configuration dump to platform
+        agent.
       payload:
         $ref: '#/components/schemas/CONFIG_INFO_REQ'
       x-response:
@@ -153,8 +162,7 @@ components:
                   public_key: nctTdgN8znYkyUvfeUmaPv7DxmTd3rfo+usC6dImaRQ=
                   listen_port: 59753
               vpn:
-                -
-                  fn: add_peer
+                - fn: add_peer
                   args:
                     allowed_ips:
                       - 10.69.10.93/32
@@ -164,7 +172,7 @@ components:
                     public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                     gw_ipv4: 10.69.0.47
                   metadata:
-                    device_id: 292:00329-10280-00000-AA017
+                    device_id: '292:00329-10280-00000-AA017'
                     device_name: Example
                     device_public_ipv4: 94.251.23.158
                     connection_id: 1025617
@@ -175,50 +183,52 @@ components:
                       agent_service_name: service_Name
                       agent_service_tcp_ports:
                         - 45444
-                      agent_service_udp_ports:
+                      agent_service_udp_ports: null
                       agent_service_subnet_ip: 172.20.0.0/26
-
     UPDATE_AGENT_CONFIG:
       summary: UPDATE_AGENT_CONFIG is a response to CONFIG_INFO message
-      description: Platform agents sends this event to controller when it wants to update configuration data, i.e. to change configured interface public key due to unrecoverable loss of data on platform agents side.
+      description: >-
+        Platform agents sends this event to controller when it wants to update
+        configuration data, i.e. to change configured interface public key due
+        to unrecoverable loss of data on platform agents side.
       payload:
         $ref: '#/components/schemas/UPDATE_AGENT_CONFIG'
       examples:
         - payload:
             id: 0OEqrxBRyAExh04b
-            executed_at: "2021-08-04T11:18:38.319935"
+            executed_at: '2021-08-04T11:18:38.319935'
             type: UPDATE_AGENT_CONFIG
             data:
-              -
-                fn: create_interface
+              - fn: create_interface
                 data:
                   public_key: O39YgbELLp80K2G5D/xZjcM0gZcRURW1LCWNc5FaO3I=
                   listen_port: 49152
                   ifname: SYNTROPY_PUBLIC
                   internal_ip: 10.69.14.97
-              -
-                fn: create_interface
+              - fn: create_interface
                 data:
                   public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
                   listen_port: 49156
                   ifname: SYNTROPY_SDN1
                   internal_ip: 10.69.14.98
-              -
-                fn: create_interface
+              - fn: create_interface
                 data:
                   public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
                   listen_port: 49153
                   ifname: SYNTROPY_SDN2
                   internal_ip: 10.69.14.99
-              -
-                fn: create_interface
+              - fn: create_interface
                 data:
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
                   listen_port: 49154
                   ifname: SYNTROPY_SDN3
                   internal_ip: 10.69.14.100
     WG_CONF:
-      description: Controller sends platform agent configuration commands, which should be executed in platform agent, i.e. to create interface, to add peer, to delete interface, to delete peer. When adding interface, controller can pick port, or agent can respond with assigned one.
+      description: >-
+        Controller sends platform agent configuration commands, which should be
+        executed in platform agent, i.e. to create interface, to add peer, to
+        delete interface, to delete peer. When adding interface, controller can
+        pick port, or agent can respond with assigned one.
       payload:
         $ref: '#/components/schemas/WG_CONF'
       examples:
@@ -226,8 +236,7 @@ components:
             id: Asa05ML1102HSJVl
             type: WG_CONF
             data:
-              -
-                fn: add_peer
+              - fn: add_peer
                 args:
                   allowed_ips:
                     - 10.69.10.93/32
@@ -237,7 +246,7 @@ components:
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                   gw_ipv4: 10.69.0.47
                 metadata:
-                  device_id: 292:00329-10280-00000-AA017
+                  device_id: '292:00329-10280-00000-AA017'
                   device_name: Example
                   device_public_ipv4: 94.251.23.158
                   connection_id: 1025617
@@ -248,34 +257,35 @@ components:
                     agent_service_name: service_Name
                     agent_service_tcp_ports:
                       - 45444
-                    agent_service_udp_ports:
+                    agent_service_udp_ports: null
                     agent_service_subnet_ip: 172.20.0.0/26
         - payload:
             id: Asa05ML1102HSJVl
             type: WG_CONF
             data:
-              -
-                fn: remove_peer
+              - fn: remove_peer
                 args:
                   ifname: SYNTROPY_PUBLIC
                   public_key: KaCq7nTViC9rhPc21ky92H7iTldGF76m3hrcSR4UdUc=
                   allowed_ips:
                     - 10.69.10.86/32
-              -
-                fn: remove_peer
+              - fn: remove_peer
                 ifname: SYNTROPY_SDN1
                 public_key: AxB/JKQ9aPRgfEA5zI00jX4aZzfxz8LwTKrYaN0OkjI=
                 allowed_ips:
-                 - 10.69.10.86/32
-
+                  - 10.69.10.86/32
     IFACES_PEERS_BW_DATA:
-      description: Platform agent periodically sends wireguard configured interfaces peers bandwith data (bandwith of one particular peer via particular interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
+      description: >-
+        Platform agent periodically sends wireguard configured interfaces peers
+        bandwith data (bandwith of one particular peer via particular
+        interface). Platform agent sends data every 10 seconds. If there is
+        nothing to report, platform agent does not send anything.
       payload:
         $ref: '#/components/schemas/IFACES_PEERS_BW_DATA'
       examples:
         - payload:
-            id: "-"
-            executed_at: "2021-09-08T12:22:01.248033"
+            id: '-'
+            executed_at: '2021-09-08T12:22:01.248033'
             type: IFACES_PEERS_BW_DATA
             data:
               - iface: SYNTROPY_PUBLIC
@@ -291,10 +301,10 @@ components:
                     tx_bytes: 888380
                     timestamp: 1631103713.179484
                     internal_ip: 10.69.10.93
-                    latency_ms:
+                    latency_ms: null
                     packet_loss: 1
                     rx_speed_mbps: 0
-                    tx_speed_mbps: -2.2794318546905317e-05
+                    tx_speed_mbps: -0.000022794318546905317
                     status: OFFLINE
                     status_reason: Packet loss 100%
               - iface: SYNTROPY_SDN1
@@ -303,7 +313,7 @@ components:
                   - ifname: SYNTROPY_SDN1
                     public_key: tkjx2fMmLqnK2f/iSquNZdBKOObeyC2+kSWCCHBXcxk=
                     allowed_ips:
-                    - 10.69.5.158/32
+                      - 10.69.5.158/32
                     last_handshake: '2021-08-18T07:19:24'
                     keep_alive_interval: 15
                     rx_bytes: 372556
@@ -321,7 +331,7 @@ components:
                   - ifname: SYNTROPY_SDN2
                     public_key: sfWquyQ/BDva7BWPegKHDC4HUhy+VcEfRTA6mX8fAyg=
                     allowed_ips:
-                    - 10.69.5.159/32
+                      - 10.69.5.159/32
                     last_handshake: '2021-08-18T07:19:24'
                     keep_alive_interval: 15
                     rx_bytes: 372556
@@ -335,45 +345,56 @@ components:
                     tx_speed_mbps: -0.00015618854658926737
               - iface: SYNTROPY_SDN3
                 iface_public_key: oIGZCz9Dazl1caNczHkn82jVcIWQxfk7a3kEoVRT7Hc=
-                peers: [ ]
-
+                peers: []
     IFACES_BW_DATA:
-      description: Platform agent periodically sends wireguard configured interfaces bandwith data (entire bandwidth passed via given interface). Platform agent sends data every 10 seconds. If there is nothing to report, platform agent does not send anything.
+      description: >-
+        Platform agent periodically sends wireguard configured interfaces
+        bandwith data (entire bandwidth passed via given interface). Platform
+        agent sends data every 10 seconds. If there is nothing to report,
+        platform agent does not send anything.
       payload:
         $ref: '#/components/schemas/IFACES_BW_DATA'
-
     IFACES_PEERS_ACTIVE_DATA:
       description: Platform agent sends information when current ACTIVE route changes.
       payload:
         $ref: '#/components/schemas/IFACES_PEERS_ACTIVE_DATA'
-
     LOGGER:
-      description: Platform agent sends nicely formatted log data to controller. This data is later redirected to platform agents index for users to consume.
+      description: >-
+        Platform agent sends nicely formatted log data to controller. This data
+        is later redirected to platform agents index for users to consume.
       payload:
         $ref: '#/components/schemas/LOGGER'
-
     NETWORK_INFO:
-      description: This event is triggered when platform agent network changes. Platform agent sends entire list of available services and their metadata.
+      description: >-
+        This event is triggered when platform agent network changes. Platform
+        agent sends entire list of available services and their metadata.
       payload:
         $ref: '#/components/schemas/NETWORK_INFO'
-
     CONTAINER_INFO:
-      description: This event is triggered when platform agent active docker containers changes. Platform agent sends entire list of available services and their metadata.
+      description: >-
+        This event is triggered when platform agent active docker containers
+        changes. Platform agent sends entire list of available services and
+        their metadata.
       payload:
         $ref: '#/components/schemas/CONTAINER_INFO'
-
     HW_SERVICE_INFO:
-      description: This event is triggered when platform agent host hw network changes. Platform agent sends entire list of available services and their metadata.
+      description: >-
+        This event is triggered when platform agent host hw network changes.
+        Platform agent sends entire list of available services and their
+        metadata.
       payload:
         $ref: '#/components/schemas/HW_SERVICE_INFO'
-
     KUBERNETES_SERVICE_INFO:
-      description: This event is triggered when services statuses changes in kubernes cluster. Platform agent sends entire list of available services and their metadata.
+      description: >-
+        This event is triggered when services statuses changes in kubernes
+        cluster. Platform agent sends entire list of available services and
+        their metadata.
       payload:
         $ref: '#/components/schemas/KUBERNETES_SERVICE_INFO'
-
     WG_ROUTE_STATUS:
-      description: Platform agent sends information about route addition. Confirms successes and failures.
+      description: >-
+        Platform agent sends information about route addition. Confirms
+        successes and failures.
       payload:
         $ref: '#/components/schemas/wg_route_status'
       examples:
@@ -382,7 +403,6 @@ components:
             event: systemStatus
             status: online
             version: 1.0.0
-
   schemas:
     AUTO_PING_REQ:
       type: object
@@ -397,8 +417,8 @@ components:
             type: string
             description: Array of ip addresses agent should ping.
       required:
-          - type
-          - data
+        - type
+        - data
     AUTO_PING_RES:
       type: object
       properties:
@@ -445,7 +465,9 @@ components:
           properties:
             agent_provider:
               type: integer
-              description: Agent provider id (https://docs.syntropystack.com/docs/syntropy-agent-variables#syntropy-provider).
+              description: >-
+                Agent provider id
+                (https://docs.syntropystack.com/docs/syntropy-agent-variables#syntropy-provider).
             service_status:
               type: boolean
               description: Status whether services are enabled by default or not.
@@ -497,10 +519,9 @@ components:
             rerouting_threshold:
               $ref: '#/components/schemas/rerouting_threshold'
       required:
-          - type
-          - id
-          - data
-
+        - type
+        - id
+        - data
     CONFIG_INFO_REQ:
       type: object
       required:
@@ -570,7 +591,10 @@ components:
           const: UPDATE_AGENT_CONFIG
         data:
           type: array
-          description: List of resulting executed VPN commands. (create_interface only atm). Need to change only if public_key/port differs from CONFIG_INFO.
+          description: >-
+            List of resulting executed VPN commands. (create_interface only
+            atm). Need to change only if public_key/port differs from
+            CONFIG_INFO.
           items:
             type: object
             properties:
@@ -611,8 +635,6 @@ components:
               - $ref: '#/components/schemas/remove_interface'
               - $ref: '#/components/schemas/add_peer'
               - $ref: '#/components/schemas/remove_peer'
-
-
     IFACES_BW_DATA:
       type: object
       required:
@@ -622,7 +644,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: IFACES_BW_DATA
@@ -652,7 +674,6 @@ components:
                 type: integer
               interval:
                 type: integer
-
     IFACES_PEERS_BW_DATA:
       type: object
       required:
@@ -662,7 +683,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: IFACES_PEERS_BW_DATA
@@ -714,8 +735,6 @@ components:
                       type: string
                     keep_alive_interval:
                       type: integer
-
-
     IFACES_PEERS_ACTIVE_DATA:
       type: object
       required:
@@ -725,7 +744,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: IFACES_PEERS_ACTIVE_DATA
@@ -742,8 +761,6 @@ components:
                 $ref: '#/components/schemas/connection_id'
               timestamp:
                 type: string
-
-
     LOGGER:
       type: object
       required:
@@ -753,7 +770,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: LOGGER
@@ -767,8 +784,6 @@ components:
               type: string
             message:
               type: string
-
-
     NETWORK_INFO:
       type: object
       required:
@@ -778,7 +793,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: NETWORK_INFO
@@ -797,7 +812,6 @@ components:
                 type: string
               docker_network_subnets:
                 $ref: '#/components/schemas/subnets'
-
     CONTAINER_INFO:
       type: object
       required:
@@ -807,7 +821,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: CONTAINER_INFO
@@ -818,7 +832,6 @@ components:
           properties:
             container_info:
               $ref: '#/components/schemas/container_info'
-
     HW_SERVICE_INFO:
       type: object
       required:
@@ -828,7 +841,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: HW_SERVICE_INFO
@@ -847,7 +860,6 @@ components:
                 type: string
               agent_network_ports:
                 $ref: '#/components/schemas/service_ports'
-
     KUBERNETES_SERVICE_INFO:
       type: object
       required:
@@ -857,7 +869,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: KUBERNETES_SERVICE_INFO
@@ -876,7 +888,6 @@ components:
                 type: string
               agent_service_ports:
                 $ref: '#/components/schemas/service_ports'
-
     create_interface:
       type: object
       required:
@@ -891,7 +902,6 @@ components:
         metadata:
           $ref: '#/components/schemas/interface_metadata'
       description: Wireguard interface creation.
-
     remove_interface:
       type: object
       required:
@@ -909,7 +919,6 @@ components:
             ifname:
               type: string
       description: Wireguard interface remove.
-
     add_peer:
       type: object
       required:
@@ -924,7 +933,6 @@ components:
         metadata:
           $ref: '#/components/schemas/peer_metadata'
       description: Wireguard add peer.
-
     remove_peer:
       type: object
       required:
@@ -946,8 +954,6 @@ components:
             allowed_ips:
               $ref: '#/components/schemas/allowed_ips'
       description: Wireguard peer remove.
-
-
     interface:
       type: object
       required:
@@ -961,7 +967,6 @@ components:
         listen_port:
           $ref: '#/components/schemas/listen_port'
       description: Wireguard interface info.
-
     peer:
       type: object
       required:
@@ -983,14 +988,12 @@ components:
         endpoint_port:
           type: string
       description: Peer fields.
-
     interface_metadata:
       type: object
       properties:
         connection_id:
           $ref: '#/components/schemas/connection_id'
       description: Interface Metadata
-
     peer_metadata:
       type: object
       properties:
@@ -1018,7 +1021,6 @@ components:
               agent_service_udp_ports:
                 $ref: '#/components/schemas/udp_ports'
       description: Peer Metadata
-
     container_info:
       type: array
       description: Array of docker network objects.
@@ -1058,14 +1060,13 @@ components:
               type: string
           agent_container_ports:
             $ref: '#/components/schemas/service_ports'
-
     wg_route_status:
       type: object
       description: Status after adding route to host routing table.
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: WG_ROUTE_STATUS
@@ -1083,7 +1084,6 @@ components:
                 $ref: '#/components/schemas/connection_group_id'
               statuses:
                 $ref: '#/components/schemas/route_statuses'
-
     route_statuses:
       type: array
       description: List of ips.
@@ -1099,7 +1099,6 @@ components:
             type: string
           msg:
             type: string
-
     service_ports:
       type: object
       description: Container ips.
@@ -1108,7 +1107,6 @@ components:
           $ref: '#/components/schemas/udp_ports'
         tcp:
           $ref: '#/components/schemas/tcp_ports'
-
     rerouting_threshold:
       type: object
       description: Rerouting thresholds.
@@ -1117,79 +1115,60 @@ components:
           $ref: '#/components/schemas/ratio'
         latency_diff:
           $ref: '#/components/schemas/latency_ms'
-
     udp_ports:
       type: array
       description: List of udp ports used by container.
       items:
         type: integer
-
     tcp_ports:
       type: array
       description: List of tcp ports used by container.
       items:
         type: integer
-
     msg_id:
       type: string
       description: Unique ID of message. (response should be sent with same id as request)
-
     public_key:
       type: string
-
     internal_ip:
       type: string
-
     latency_ms:
       type: integer
-
     ratio:
       type: number
-
     packet_loss:
       type: number
-
     peer_status:
       type: string
       enum:
         - CONNECTED
         - WARNING
         - OFFLINE
-
     route_status:
       type: string
       enum:
         - ERROR
         - OK
-
     allowed_ips:
       type: array
       description: List of ips.
       items:
         type: string
-
     listen_port:
       type: integer
       description: Interface listening port.
-
     rx_bytes:
       type: integer
-
     tx_bytes:
       type: integer
-
     tx_speed_mbps:
       type: number
-
     rx_speed_mbps:
       type: number
-
     connection_id:
       type: integer
-
     connection_group_id:
       type: integer
-
     subnets:
       type: array
       items:
