@@ -402,7 +402,7 @@ components:
           type: string
           const: AUTO_PING
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         data:
           type: array
           description: Array of ips.
@@ -438,13 +438,14 @@ components:
       type: object
       required:
         - id
+        - executed_at
         - type
         - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: INIT_INFO
@@ -508,13 +509,14 @@ components:
       type: object
       required:
         - id
+        - executed_at
         - type
         - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: SUPPORT_INFO
@@ -551,12 +553,13 @@ components:
       description: Need to send only if interfaces updated compared to SET_CONFIG (CTA).
       required:
         - id
+        - executed_at
         - type
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: CONFIG_INFO
@@ -608,7 +611,7 @@ components:
           $ref: '#/components/schemas/msg_id'
           default: '-'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: NETWORK_STATISTICS (ATC)
@@ -653,6 +656,7 @@ components:
       type: object
       required:
         - id
+        - executed_at
         - type
         - data
       properties:
@@ -660,7 +664,7 @@ components:
           $ref: '#/components/schemas/msg_id'
           default: '-'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: SERVICE_ROUTE_CHANGE (ATC)
@@ -689,7 +693,7 @@ components:
           $ref: '#/components/schemas/msg_id'
           default: '-'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: LOGGER (ATC)
@@ -707,6 +711,7 @@ components:
       type: object
       required:
         - id
+        - executed_at
         - type
         - data
       properties:
@@ -714,7 +719,7 @@ components:
           $ref: '#/components/schemas/msg_id'
           default: '-'
         executed_at:
-          type: string
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
           const: SERVICE_INFO (ATC)
@@ -1060,6 +1065,9 @@ components:
     msg_id:
       type: string
       description: Unique ID of message. (response should be sent with same id as request)
+    executed_at:
+      type: string
+      format: date-time
     public_key:
       type: string
     index:
