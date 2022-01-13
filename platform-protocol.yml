@@ -88,20 +88,26 @@ components:
                 - 173.104.147.220
               interval: 60
               response_limit: 5
-        - payload:
-            id: nEsBfD773UlafZ12
-            type: AUTO_PING
-            data:
-              hosts:
-                - null
-              interval: 60
-              response_limit: 5
     AUTO_PING (ATC):
       description: >-
         Response results count should be limited to `response_limit` best
         results, sorted by latency.
       payload:
         $ref: '#/components/schemas/AUTO_PING (ATC)'
+      examples:
+        - payload:
+            id: nEsBfD773UlafZnf
+            type: AUTO_PING
+            data:
+            - ip: 23.95.220.138
+              latency_ms: 200
+              packet_loss: 0.5
+            - ip: 94.237.29.266
+              latency_ms: 2
+              packet_loss: 0
+            - ip: 173.104.147.220
+              packet_loss: 1
+
     GET_INIT_INFO (CTA):
       summary: Event for getting essential info about endpoint.
       description: >-
@@ -133,25 +139,22 @@ components:
       examples:
         - payload:
             id: 4QpCCN4NDhwAGi1X
-            executed_at: '2021-09-14T23:21:50.631912'
+            executed_at: '2019-08-24T14:15:22Z'
             type: INIT_INFO
             data:
-              external_ip: 80.208.227.130
-              network_info:
-                - agent_network_id: >-
-                    b1fa1f0bdc38eb1862e1fcdcdcf2f26883c2f63473fe57f87ebe08ad48366200
-                  agent_network_name: bridge
-                  agent_network_subnets:
-                    - 172.17.0.0/16
-              agent_name: 2yfq.l.time4vps.cloud
-              agent_provider: null
-              agent_category: null
-              service_status: false
-              agent_tags: []
-              network_ids: []
-              container_info: []
-              location_lat: null
-              location_lon: null
+              agent:
+                name: ProtocolAgent
+                provider: 3
+                tags:
+                - Protocol
+                - DEMO
+                public_ip: 80.208.227.130
+                version: 0.5.0
+                operating_system: LINUX
+              config:
+                auto_connect_services: false
+
+
     GET_SUPPORT_INFO (CTA):
       summary: Event for getting debug info about endpoint.
       payload:
@@ -178,36 +181,61 @@ components:
         $ref: '#/components/messages/CONFIG_INFO (ATC)'
       examples:
         - payload:
-            id: Asa05ML1102HSJVl
-            type: SET_CONFIG
+            id: ERpCCdsNDhwAXi4X
+            type: CONFIG_INFO
             data:
-              agent_id: 1664
               interfaces:
-                - name: PUBLIC
-                  private_ip: 10.69.0.146
-                  public_key: RzaBT6fXJime+KEFJKkWrozumOEDPpZhJaHWPZmerAA=
-                  port: 35524
-                  peers:
-                    - public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
-                      private_ip: 10.69.100.23
-                      public_ip: 94.251.23.158
-                      port: 0
-                      connection_id: 1025617
-                      connection_group_id: 75582
-                      agent_id: 6172
-                      services:
-                        - ip: 172.20.0.0/26
-                          name: service_Name
-                          ports:
-                            tcp:
-                              - 1234
-                              - 43344
-                            udp:
-                              - 23543
-                      action:
-                        enum:
-                          - ADD
-                          - DEL
+              - index: 0
+                internal_ip: 10.69.0.146
+                peers:
+                - action: ADD
+                  index: 0
+                  public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
+                  private_ip: 10.69.88.21
+                  public_ip: 194.51.24.152
+                  port: 5443
+                  connection_id: 1025317
+                  connection_group_id: 75122
+                  services:
+                  - ip: 172.20.0.2/32
+                    name: Prometheus
+                    ports:
+                      udp:
+                      - 9090
+                      tcp:
+                      - 9090
+                - action: ADD
+                  index: 0
+                  public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
+                  private_ip: 10.69.100.23
+                  public_ip: 94.251.23.158
+                  port: 5443
+                  connection_id: 1025619
+                  connection_group_id: 75587
+                  services:
+                  - ip: 172.21.0.3/32
+                    name: MongoDB
+                    ports:
+                      tcp:
+                      - 27017
+              - index: 1
+                internal_ip: 10.69.0.147
+                peers:
+                - action: ADD
+                  index: 1
+                  public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
+                  private_ip: 10.69.100.24
+                  public_ip: 94.251.23.158
+                  port: 5444
+                  connection_id: 1025618
+                  connection_group_id: 75587
+                  services:
+                  - ip: 172.21.0.3/32
+                    name: MongoDB
+                    ports:
+                      tcp:
+                      - 27017
+
     CONFIG_INFO (ATC):
       summary: CONFIG_INFO (ATC) is a response to SET_CONFIG (CTA) message
       description: >-
@@ -218,35 +246,20 @@ components:
         $ref: '#/components/schemas/CONFIG_INFO (ATC)'
       examples:
         - payload:
-            id: 0OEqrxBRyAExh04b
-            executed_at: '2021-08-04T11:18:38.319935'
-            type: CONFIG_INFO (ATC)
+            id: ERpCCdsNDhwAXi4X
+            executed_at: '2019-08-24T14:15:22Z'
+            type: CONFIG_INFO
             data:
-              - fn: create_interface
-                data:
-                  public_key: O39YgbELLp80K2G5D/xZjcM0gZcRURW1LCWNc5FaO3I=
-                  listen_port: 49152
-                  index: 0
-                  internal_ip: 10.69.14.97
-                  status: 0
-              - fn: create_interface
-                data:
+              interfaces:
+                - index: 0
+                  internal_ip: 10.69.0.146
+                  public_key: RzaBT6fXJime+KEFJKkWrozumOEDPpZhJaHWPZmerAA=
+                  port: 3333
+                - index: 1
+                  internal_ip: 10.69.0.147
                   public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
-                  listen_port: 49156
-                  index: 1
-                  internal_ip: 10.69.14.98
-              - fn: create_interface
-                data:
-                  public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
-                  listen_port: 49153
-                  index: 2
-                  internal_ip: 10.69.14.99
-              - fn: create_interface
-                data:
-                  public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
-                  listen_port: 49154
-                  index: 3
-                  internal_ip: 10.69.14.100
+                  port: 3334
+
     SET_PEER_CONF (CTA):
       description: >-
         Controller sends platform agent configuration commands, which should be
@@ -260,29 +273,41 @@ components:
             id: Asa05ML1102HSJVl
             type: SET_PEER_CONF
             data:
-              - fn: add_peer
-                args:
-                  allowed_ips:
-                    - 10.69.10.93/32
-                  endpoint_ipv4: 94.251.23.158
-                  endpoint_port: 0
-                  index: SYNTROPY_PUBLIC
+                - action: ADD
+                  index: 0
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
-                  gw_ipv4: 10.69.0.47
-                metadata:
-                  device_id: '292:00329-10280-00000-AA017'
-                  device_name: Example
-                  device_public_ipv4: 94.251.23.158
-                  connection_id: 1025617
-                  connection_group_id: 75582
-                  agent_id: 6172
-                  link_tag: PUBLIC
-                  allowed_ips_info:
-                    agent_service_name: service_Name
-                    agent_service_tcp_ports:
-                      - 45444
-                    agent_service_udp_ports: null
-                    agent_service_subnet_ip: 172.20.0.0/26
+                  private_ip: 10.69.88.21
+                  public_ip: 194.51.24.152
+                  port: 5443
+                  connection_id: 1025317
+                  connection_group_id: 75122
+                  services:
+                  - ip: 172.20.0.2/32
+                    name: Prometheus
+                    ports:
+                      udp:
+                      - 9090
+                      tcp:
+                      - 9090
+                - action: ADD
+                  index: 0
+                  public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
+                  private_ip: 10.69.100.23
+                  public_ip: 94.251.23.158
+                  port: 5443
+                  connection_id: 1025619
+                  connection_group_id: 75587
+                  services:
+                  - ip: 172.21.0.3/32
+                    name: MongoDB
+                    ports:
+                      tcp:
+                      - 27017
+                - action: DEL
+                  index: 1
+                  public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
+                  private_ip: 10.69.100.24
+
         - payload:
             id: Asa05ML1102HSJVl
             type: SET_PEER_CONF (CTA)
@@ -308,53 +333,117 @@ components:
         $ref: '#/components/schemas/NETWORK_STATISTICS (ATC)'
       examples:
         - payload:
-            id: '-'
-            executed_at: '2021-09-08T12:22:01.248033'
+            id: "-"
+            executed_at: '2019-08-24T14:15:22Z'
             type: NETWORK_STATISTICS (ATC)
             data:
-              - index: SYNTROPY_PUBLIC
-                peers:
-                  - connection_id: 2344
-                    connection_group_id: 344
-                    last_handshake: '2021-09-08T03:35:52'
-                    rx_bytes: 308
-                    tx_bytes: 888380
-                    latency_ms: null
-                    packet_loss: 1
-                    rx_bps: 354
-                    tx_bps: 553
-              - index: SYNTROPY_SDN1
-                peers:
-                  - connection_id: 3244
-                    connection_group_id: 345
-                    rx_bytes: 372556
-                    tx_bytes: 417812
-                    latency_ms: 188.1084442138672
-                    packet_loss: 0
-                    rx_bps: 3453
-                    tx_bps: 4545
+            - index: 0
+              peers:
+              - connection_id: 1025317
+                connection_group_id: 75122
+                last_handshake: '2019-08-24T14:15:22Z'
+                latency_ms: 5
+                packet_loss: 0
+                rx_bytes: 3085555553332344
+                tx_bytes: 4353444344444444
+                tx_bps: 44000
+                rx_bps: 50000
+            - index: 0
+              peers:
+              - connection_id: 1025619
+                connection_group_id: 75587
+                last_handshake: '2019-08-24T14:15:22Z'
+                latency_ms: 12
+                packet_loss: 0
+                rx_bytes: 6085555553332344
+                tx_bytes: 3353444344444444
+                tx_bps: 44000
+                rx_bps: 50000
+            - index: 1
+              peers:
+              - connection_id: 1025618
+                connection_group_id: 75587
+                last_handshake: '2019-08-24T14:15:22Z'
+                latency_ms: 355
+                packet_loss: 0.9
+                rx_bytes: 30855
+                tx_bytes: 43534
+                tx_bps: 100
+                rx_bps: 8600
+
     SERVICE_ROUTE_CHANGE (ATC):
       description: Platform agent sends information when current ACTIVE route changes.
       payload:
         $ref: '#/components/schemas/SERVICE_ROUTE_CHANGE (ATC)'
+      examples:
+        - payload:
+            id: "-"
+            executed_at: '2019-08-24T14:15:22Z'
+            type: SERVICE_ROUTE_CHANGE (ATC)
+            data:
+            - prev_connection_id: 23444
+              connection_id: 23443
+            - prev_connection_id: 23441
+              connection_id: 23446
+
     LOGGER (ATC):
       description: >-
         Platform agent sends nicely formatted log data to controller. This data
         is later redirected to platform agents index for users to consume.
       payload:
         $ref: '#/components/schemas/LOGGER (ATC)'
+      examples:
+        - payload:
+            id: "-"
+            executed_at: '2019-08-24T14:15:22Z'
+            type: LOGGER (ATC)
+            data:
+              severity: DEBUG
+              message: "[INFO] Debug message example"
+
     SERVICE_INFO (ATC):
       description: >-
         This event is triggered when platform agent network changes. Platform
         agent sends entire list of available services and their metadata.
       payload:
         $ref: '#/components/schemas/SERVICE_INFO (ATC)'
+      examples:
+        - payload:
+            id: "-"
+            executed_at: '2019-08-24T14:15:22Z'
+            type: SERVICE_INFO (ATC)
+            data:
+            - name: PostgresSQL
+              type: DOCKER
+              ip: 172.23.0.3/32
+              network:
+              - postgres_default
+              ports:
+                tcp:
+                - 5432
+
+
     SERVICE_STATUS (ATC):
       description: >-
         Platform agent sends information about route addition. Confirms
         successes and failures.
       payload:
         $ref: '#/components/schemas/service_status'
+      examples:
+        - payload:
+            id: "-"
+            type: SERVICE_STATUS
+            data:
+            - connection_id: 1025317
+              connection_group_id: 75122
+              statuses:
+              - status: ERROR
+                ip: 172.20.0.2/32
+                msg: OVERLAP
+              - status: OK
+                ip: 172.21.0.3/32
+
+
   schemas:
     SET_AUTO_PING (CTA):
       type: object
