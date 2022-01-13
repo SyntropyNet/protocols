@@ -361,9 +361,12 @@ components:
     SET_AUTO_PING (CTA):
       type: object
       required:
+        - id
         - type
         - data
       properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
         type:
           type: string
           const: SET_AUTO_PING
@@ -388,10 +391,13 @@ components:
     AUTO_PING (ATC):
       type: object
       required:
+        - id
         - type
         - executed_at
         - data
       properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
         type:
           type: string
           const: AUTO_PING
@@ -422,7 +428,7 @@ components:
         - type
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/msg_id'
         type:
           type: string
           const: GET_INIT_INFO
@@ -436,7 +442,7 @@ components:
         - data
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/msg_id'
         executed_at:
           type: string
         type:
@@ -492,7 +498,7 @@ components:
         - type
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/msg_id'
         type:
           type: string
           const: GET_SUPPORT_INFO
@@ -506,7 +512,7 @@ components:
         - data
       properties:
         id:
-          type: string
+          $ref: '#/components/schemas/msg_id'
         executed_at:
           type: string
         type:
