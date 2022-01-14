@@ -182,7 +182,7 @@ components:
       examples:
         - payload:
             id: ERpCCdsNDhwAXi4X
-            type: CONFIG_INFO
+            type: SET_CONFIG
             data:
               interfaces:
               - index: 0
@@ -335,7 +335,7 @@ components:
         - payload:
             id: "-"
             executed_at: '2019-08-24T14:15:22Z'
-            type: NETWORK_STATISTICS (ATC)
+            type: NETWORK_STATISTICS
             data:
             - index: 0
               peers:
@@ -379,7 +379,7 @@ components:
         - payload:
             id: "-"
             executed_at: '2019-08-24T14:15:22Z'
-            type: SERVICE_ROUTE_CHANGE (ATC)
+            type: SERVICE_ROUTE_CHANGE
             data:
             - prev_connection_id: 23444
               connection_id: 23443
@@ -411,7 +411,7 @@ components:
         - payload:
             id: "-"
             executed_at: '2019-08-24T14:15:22Z'
-            type: SERVICE_INFO (ATC)
+            type: SERVICE_INFO
             data:
             - name: PostgresSQL
               type: DOCKER
@@ -513,6 +513,7 @@ components:
       required:
         - id
         - type
+        - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -584,6 +585,7 @@ components:
       required:
         - id
         - type
+        - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
@@ -642,6 +644,7 @@ components:
         - id
         - executed_at
         - type
+        - data
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
