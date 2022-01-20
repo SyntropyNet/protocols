@@ -187,7 +187,9 @@ components:
               interfaces:
               - index: 0
                 internal_ip: 10.69.0.146
-                peers:
+              - index: 1
+                internal_ip: 10.69.0.147
+              peers:
                 - action: ADD
                   index: 0
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
@@ -196,14 +198,6 @@ components:
                   port: 5443
                   connection_id: 1025317
                   connection_group_id: 75122
-                  services:
-                  - ip: 172.20.0.2/32
-                    name: Prometheus
-                    ports:
-                      udp:
-                      - 9090
-                      tcp:
-                      - 9090
                 - action: ADD
                   index: 0
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
@@ -212,15 +206,6 @@ components:
                   port: 5443
                   connection_id: 1025619
                   connection_group_id: 75587
-                  services:
-                  - ip: 172.21.0.3/32
-                    name: MongoDB
-                    ports:
-                      tcp:
-                      - 27017
-              - index: 1
-                internal_ip: 10.69.0.147
-                peers:
                 - action: ADD
                   index: 1
                   public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
@@ -229,12 +214,36 @@ components:
                   port: 5444
                   connection_id: 1025618
                   connection_group_id: 75587
-                  services:
-                  - ip: 172.21.0.3/32
-                    name: MongoDB
-                    ports:
-                      tcp:
+              services:
+                - action: ADD
+                  ip: 172.21.0.3/32
+                  name: MongoDB
+                  connection_ids:
+                    - 1025317
+                  ports:
+                    tcp:
                       - 27017
+                - action: ADD
+                  ip: 172.20.0.2/32
+                  name: Prometheus
+                  connection_ids:
+                    - 1025619
+                    - 1025618
+                  ports:
+                    udp:
+                      - 9090
+                    tcp:
+                      - 9090
+              settings:
+                rerouting:
+                  - action: ADD
+                    rerouting_threshold: 20
+                    latency_coefficient: 1.2
+                  - action: ADD
+                    rerouting_threshold: 50
+                    latency_coefficient: 1.8
+                    connection_group_ids:
+                      - 1025317
 
     CONFIG_INFO (ATC):
       summary: CONFIG_INFO (ATC) is a response to SET_CONFIG (CTA) message
@@ -637,6 +646,21 @@ components:
               type: array
               items:
                 - $ref: '#/components/schemas/interface'
+            peers:
+              type: array
+              items:
+                - $ref: '#/components/schemas/peer'
+            services:
+              type: array
+              items:
+                - $ref: '#/components/schemas/service'
+            settings:
+              type: object
+              properties:
+                rerouting:
+                  type: array
+                  items:
+                    - $ref: '#/components/schemas/rerouting_threshold'
     CONFIG_INFO (ATC):
       type: object
       description: Need to send only if interfaces updated compared to SET_CONFIG (CTA).
@@ -932,7 +956,7 @@ components:
         - connection_group_id
       properties:
         action:
-          $ref: '#/components/schemas/peer_action'
+          $ref: '#/components/schemas/action'
         index:
           $ref: '#/components/schemas/index'
         public_key:
@@ -950,18 +974,27 @@ components:
         services:
           type: array
           items:
-            type: object
-            required:
-              - ip
-              - name
-            properties:
-              ip:
-                $ref: '#/components/schemas/ip'
-              name:
-                type: string
-              ports:
-                $ref: '#/components/schemas/service_ports'
+            - $ref: '#/components/schemas/service'
       description: Peer fields.
+    service:
+      type: object
+      required:
+        - ip
+        - name
+        - action
+      properties:
+        action:
+          $ref: '#/components/schemas/action'
+        ip:
+          $ref: '#/components/schemas/ip'
+        name:
+          type: string
+        connection_ids:
+          type: array
+          items:
+            - $ref: '#/components/schemas/connection_id'
+        ports:
+          $ref: '#/components/schemas/service_ports'
     interface_metadata:
       type: object
       properties:
@@ -1143,6 +1176,26 @@ components:
           type: string
         value:
           type: string
+
+    rerouting_threshold:
+      type: object
+      description: Rerouting thresholds.
+      required:
+        - rerouting_threshold
+        - latency_coefficient
+        - action
+      properties:
+        action:
+          $ref: '#/components/schemas/action'
+        latency_coefficient:
+          $ref: '#/components/schemas/ratio'
+        rerouting_threshold:
+          $ref: '#/components/schemas/latency_ms'
+        connection_group_ids:
+          type: array
+          description: Empty if global.
+          items:
+            type: integer
     service_ports:
       type: object
       description: Service ports.
@@ -1177,9 +1230,11 @@ components:
       type: string
     latency_ms:
       type: number
+    ratio:
+      type: number
     packet_loss:
       type: number
-    peer_action:
+    action:
       type: string
       enum:
         - ADD
