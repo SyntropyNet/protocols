@@ -264,10 +264,6 @@ components:
                   index: 0
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                   private_ip: 10.69.88.21
-                  public_ip: 194.51.24.152
-                  port: 5443
-                  connection_id: 1025317
-                  connection_group_id: 75122
               services:
                 - action: DEL
                   ip: 172.21.0.3/32
@@ -279,10 +275,10 @@ components:
                       - 27017
               settings:
                 rerouting:
-                  - action: UPDATE
+                  - action: ADD
                     rerouting_threshold: 12
                     latency_coefficient: 3.4
-                  - action: UPDATE
+                  - action: ADD
                     rerouting_threshold: 33
                     latency_coefficient: 5.3
                     connection_group_ids:
