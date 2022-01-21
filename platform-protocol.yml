@@ -245,6 +245,15 @@ components:
                     latency_coefficient: 1.8
                     connection_group_ids:
                       - 1025317
+                auto_ping:
+                  action: SET
+                  ips:
+                    - 23.95.220.138
+                    - 94.237.29.266
+                    - 173.104.147.220
+                  interval: 1
+                  response_limit: 5
+
     UPDATE_CONFIG (CTA):
       description: >-
         Event is triggered when platform agent updates connection with
@@ -700,6 +709,8 @@ components:
                   type: array
                   items:
                     - $ref: '#/components/schemas/rerouting_threshold'
+                auto_ping:
+                  $ref: '#/components/schemas/set_auto_ping'
     CONFIG_INFO (ATC):
       type: object
       description: Need to send only if interfaces updated compared to SET_CONFIG (CTA).
@@ -898,6 +909,24 @@ components:
                   type: string
               ports:
                 $ref: '#/components/schemas/service_ports'
+    set_auto_ping:
+      type: object
+      required:
+        - ips
+        - interval
+      properties:
+        ips:
+          type: array
+          description: Array of ips.
+          items:
+            type: string
+            description: Array of ip addresses agent should ping.
+        interval:
+          $ref: '#/components/schemas/interval'
+          description: Interval in seconds to ping hosts.
+        response_limit:
+          $ref: '#/components/schemas/response_limit'
+          description: Count of best results to send in response.
     create_interface:
       type: object
       required:
