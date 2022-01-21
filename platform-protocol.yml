@@ -191,7 +191,7 @@ components:
               - index: 1
                 internal_ip: 10.69.0.147
               peers:
-                - action: ADD
+                - action: SET
                   index: 0
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                   private_ip: 10.69.88.21
@@ -199,7 +199,7 @@ components:
                   port: 5443
                   connection_id: 1025317
                   connection_group_id: 75122
-                - action: ADD
+                - action: SET
                   index: 0
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
                   private_ip: 10.69.100.23
@@ -207,7 +207,7 @@ components:
                   port: 5443
                   connection_id: 1025619
                   connection_group_id: 75587
-                - action: ADD
+                - action: SET
                   index: 1
                   public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
                   private_ip: 10.69.100.24
@@ -216,7 +216,7 @@ components:
                   connection_id: 1025618
                   connection_group_id: 75587
               services:
-                - action: ADD
+                - action: SET
                   ip: 172.21.0.3/32
                   name: MongoDB
                   connection_ids:
@@ -224,7 +224,7 @@ components:
                   ports:
                     tcp:
                       - 27017
-                - action: ADD
+                - action: SET
                   ip: 172.20.0.2/32
                   name: Prometheus
                   connection_ids:
@@ -237,10 +237,10 @@ components:
                       - 9090
               settings:
                 rerouting:
-                  - action: ADD
+                  - action: SET
                     rerouting_threshold: 20
                     latency_coefficient: 1.2
-                  - action: ADD
+                  - action: SET
                     rerouting_threshold: 50
                     latency_coefficient: 1.8
                     connection_group_ids:
@@ -275,10 +275,10 @@ components:
                       - 27017
               settings:
                 rerouting:
-                  - action: ADD
+                  - action: SET
                     rerouting_threshold: 12
                     latency_coefficient: 3.4
-                  - action: ADD
+                  - action: SET
                     rerouting_threshold: 33
                     latency_coefficient: 5.3
                     connection_group_ids:
@@ -321,7 +321,7 @@ components:
             id: Asa05ML1102HSJVl
             type: SET_PEER_CONF
             data:
-                - action: ADD
+                - action: SET
                   index: 0
                   public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
                   private_ip: 10.69.88.21
@@ -337,7 +337,7 @@ components:
                       - 9090
                       tcp:
                       - 9090
-                - action: ADD
+                - action: SET
                   index: 0
                   public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
                   private_ip: 10.69.100.23
@@ -1276,8 +1276,7 @@ components:
     action:
       type: string
       enum:
-        - ADD
-        - UPDATE
+        - SET
         - DEL
     route_status:
       type: string
