@@ -52,6 +52,7 @@ channels:
         oneOf:
           - $ref: '#/components/messages/GET_INIT_INFO (CTA)'
           - $ref: '#/components/messages/SET_CONFIG (CTA)'
+          - $ref: '#/components/messages/UPDATE_CONFIG (CTA)'
           - $ref: '#/components/messages/SET_AUTO_PING (CTA)'
           - $ref: '#/components/messages/SET_PEER_CONF (CTA)'
           - $ref: '#/components/messages/GET_SUPPORT_INFO (CTA)'
@@ -242,6 +243,48 @@ components:
                   - action: ADD
                     rerouting_threshold: 50
                     latency_coefficient: 1.8
+                    connection_group_ids:
+                      - 1025317
+    UPDATE_CONFIG (CTA):
+      description: >-
+        Event is triggered when platform agent updates connection with
+        controller. Controller sends only diff configuration dump to platform
+        agent.
+      payload:
+        $ref: '#/components/schemas/SET_CONFIG'
+      x-response:
+        $ref: '#/components/messages/CONFIG_INFO (ATC)'
+      examples:
+        - payload:
+            id: ERpCCdsNDhwAXi4X
+            type: UPDATE_CONFIG
+            data:
+              peers:
+                - action: DEL
+                  index: 0
+                  public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
+                  private_ip: 10.69.88.21
+                  public_ip: 194.51.24.152
+                  port: 5443
+                  connection_id: 1025317
+                  connection_group_id: 75122
+              services:
+                - action: DEL
+                  ip: 172.21.0.3/32
+                  name: MongoDB
+                  connection_ids:
+                    - 1025317
+                  ports:
+                    tcp:
+                      - 27017
+              settings:
+                rerouting:
+                  - action: UPDATE
+                    rerouting_threshold: 12
+                    latency_coefficient: 3.4
+                  - action: UPDATE
+                    rerouting_threshold: 33
+                    latency_coefficient: 5.3
                     connection_group_ids:
                       - 1025317
 
@@ -1238,6 +1281,7 @@ components:
       type: string
       enum:
         - ADD
+        - UPDATE
         - DEL
     route_status:
       type: string
