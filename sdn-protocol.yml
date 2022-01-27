@@ -115,7 +115,7 @@ components:
               description: Object containing ping information
               properties:
                 latency_ms:
-                  type: integer
+                  type: number
                 packet_loss:
                   type: number
     NFTABLES:
