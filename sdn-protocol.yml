@@ -65,7 +65,7 @@ components:
         SDN agent sends nicely formatted log data to controller. This data is
         later redirected to sdn agents index for users to consume.
       payload:
-        $ref: '#/components/schemas/LOGGER'
+        $ref: '#/components/schemas/LOGGER (ATC)'
 
 
     GET_SUPPORT_INFO (CTA):
@@ -119,17 +119,19 @@ components:
           properties:
             agent_id:
               type: string
-            unat4:
+            unat4_table:
               type: array
-              description: Configure NFTABLES / EBPF
               items:
-                type: object
-                oneOf:
-                  - $ref: '#/components/schemas/unat4_table_add'
-                  - $ref: '#/components/schemas/unat4_table_add'
-                  - $ref: '#/components/schemas/unat4_table_del'
-                  - $ref: '#/components/schemas/unat4_mapping_clear'
-                  - $ref: '#/components/schemas/unat4_mapping_get'
+                - $ref: '#/components/schemas/unat4_table'
+            unat4_mapping:
+              type: array
+              items:
+                - $ref: '#/components/schemas/unat4_mapping'
+            settings:
+              type: object
+              properties:
+                auto_ping:
+                  $ref: '#/components/schemas/set_auto_ping'
     CONFIG_INFO (ATC):
       type: object
       description: TBD
@@ -150,17 +152,14 @@ components:
           type: object
           description: TBD
           properties:
-            unat4:
+            unat4_table:
               type: array
-              description: Configure NFTABLES / EBPF
               items:
-                type: object
-                oneOf:
-                  - $ref: '#/components/schemas/unat4_table_add'
-                  - $ref: '#/components/schemas/unat4_table_add'
-                  - $ref: '#/components/schemas/unat4_table_del'
-                  - $ref: '#/components/schemas/unat4_mapping_clear'
-                  - $ref: '#/components/schemas/unat4_mapping_get'
+                - $ref: '#/components/schemas/unat4_table'
+            unat4_mapping:
+              type: array
+              items:
+                - $ref: '#/components/schemas/unat4_mapping'
             settings:
               type: object
               properties:
@@ -186,19 +185,22 @@ components:
                 type: integer
               packet_loss:
                 type: number
-    LOGGER:
+    LOGGER (ATC):
       type: object
       required:
         - id
         - type
         - data
+        - executed_at
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
           default: '-'
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
         type:
           type: string
-          const: LOGGER
+          const: LOGGER (ATC)
         data:
           type: object
           required:
@@ -206,7 +208,7 @@ components:
             - message
           properties:
             severity:
-              type: string
+              $ref: '#/components/schemas/severity'
             message:
               type: string
     SUPPORT_INFO (CTA):
@@ -257,93 +259,31 @@ components:
         interval:
           $ref: '#/components/schemas/interval'
           description: Interval in seconds to ping hosts.
-    unat4_table_add:
+    unat4_table:
       type: object
       required:
-        - fn
-        - args
+        - addr
+        - action
       properties:
-        fn:
-          type: string
-          const: unat4_table_add
-        args:
-          type: object
-          required:
-            - addr
-          properties:
-            addr:
-              $ref: '#/components/schemas/ip_addr'
-      description: Unat4 table creation.
-    unat4_table_del:
-      type: object
-      proprties:
-        fn:
-          type: string
-          const: unat4_table_del
-        args:
-          type: object
-    unat4_mapping_clear:
+        action:
+          $ref: '#/components/schemas/action'
+        addr:
+          $ref: '#/components/schemas/ip_addr'
+    unat4_mapping:
       type: object
       required:
-        - fn
-        - args
+        - action
+        - addr
+        - port
       properties:
-        fn:
-          type: string
-          const: unat4_mapping_clear
-        args:
-          type: object
-          required:
-            - addr
-            - port
-          properties:
-            addr:
-              $ref: '#/components/schemas/ip_addr'
-            port:
-              $ref: '#/components/schemas/port'
-      description: Delete mapping
-    unat4_mapping_get:
-      type: object
-      required:
-        - fn
-        - args
-      properties:
-        fn:
-          type: string
-          const: unat4_mapping_get
-        args:
-          type: object
-          required:
-            - addr
-            - port
-          properties:
-            addr:
-              $ref: '#/components/schemas/ip_addr'
-            port:
-              $ref: '#/components/schemas/port'
-      description: Get mapping info
-    unat4_mapping_set:
-      type: object
-      required:
-        - fn
-        - args
-      properties:
-        fn:
-          type: string
-          const: unat4_table_set
-        args:
-          type: object
-          required:
-            - addr
-            - port
-          properties:
-            addr:
-              $ref: '#/components/schemas/ip_addr'
-            port:
-              $ref: '#/components/schemas/port'
-            endpoints:
-              $ref: '#/components/schemas/endpoints'
-      description: Unat4 mapping set.
+        action:
+          $ref: '#/components/schemas/action'
+        addr:
+          $ref: '#/components/schemas/ip_addr'
+        port:
+          $ref: '#/components/schemas/port'
+        endpoints:
+          $ref: '#/components/schemas/endpoints'
     endpoints:
       type: object
       required:
@@ -381,3 +321,10 @@ components:
       enum:
         - SET
         - DEL
+    severity:
+      type: string
+      enum:
+        - DEBUG
+        - INFO
+        - WARNING
+        - ERROR
