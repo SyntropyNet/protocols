@@ -120,9 +120,7 @@ components:
             agent_id:
               type: string
             unat4_table:
-              type: array
-              items:
-                - $ref: '#/components/schemas/unat4_table'
+              $ref: '#/components/schemas/unat4_table'
             unat4_mapping:
               type: array
               items:
