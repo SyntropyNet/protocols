@@ -1,15 +1,19 @@
-asyncapi: 2.0.0
-
+asyncapi: 2.2.0
 info:
   title: Syntropy Websockets API
-  version: '1.0.0'
-  description: |
-    Syntropy SGN WebSockets API allows to connect with Syntropy controller and get SDN node configuration updates and return required info to controller.
+  version: 1.0.0
+  description: >
+    Syntropy SGN WebSockets API allows to connect with Syntropy controller and
+    get SDN node configuration updates and return required info to controller.
+
 
     ### General Rules
 
+
     - Agent version must be valid semver https://semver.org/.
+
     - All messages sent and received via WebSockets are encoded in JSON format
+
 
     ### HTTP request headers when connecting to controller websocket.
       ```
@@ -22,8 +26,9 @@ info:
       }
 
       ```
-    #### On Connect to retrieve latest configuration info agent should fetch it from https://controller-sandbox-server.syntropystack.com/api/agents/auth_key/config?ip=AGENT_PUBLIC_IP
-
+    #### On Connect to retrieve latest configuration info agent should fetch it
+    from
+    https://controller-sandbox-server.syntropystack.com/api/agents/auth_key/config?ip=AGENT_PUBLIC_IP
 servers:
   prod:
     url: controller-prod-agents.syntropystack.com?auth_key=auth_key
@@ -40,59 +45,127 @@ servers:
     protocol: wss
     description: |
       Sometimes Stable Sandbox server for agents.
-
 channels:
   /:
     subscribe:
       description: Receive messages from the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/AUTO_PING'
-          - $ref: '#/components/messages/NFTABLES'
-
+          - $ref: '#/components/messages/SET_CONFIG (CTA)'
+          - $ref: '#/components/messages/UPDATE_CONFIG (CTA)'
     publish:
       description: Send messeges to the controller
       message:
         oneOf:
           - $ref: '#/components/messages/LOGGER'
-
-
 components:
   messages:
-    AUTO_PING:
-      description: Controller sets list of hosts for sdn agent to ping and repeat interval in seconds. Platform agent respons periodically with pinging information.
-      payload:
-        $ref: '#/components/schemas/AUTO_PING_REQ'
-      x-response:
-        $ref: '#/components/schemas/AUTO_PING_RES'
-
-    NFTABLES:
-      description: Controller sends sdn agent configuration settings.
-      payload:
-        $ref: '#/components/schemas/NFTABLES'
-
     LOGGER:
-      description: SDN agent sends nicely formatted log data to controller. This data is later redirected to sdn agents index for users to consume.
+      description: >-
+        SDN agent sends nicely formatted log data to controller. This data is
+        later redirected to sdn agents index for users to consume.
       payload:
         $ref: '#/components/schemas/LOGGER'
 
 
+    GET_SUPPORT_INFO (CTA):
+      summary: Event for getting debug info about endpoint.
+      payload:
+        $ref: '#/components/schemas/SUPPORT_INFO (CTA)'
+      x-response:
+        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
+      examples:
+        - payload:
+            id: nEsBfD773UlafZ12
+            type: SUPPORT_INFO
+            data: {}
+    SUPPORT_INFO (ATC):
+      summary: Event for getting debug info about endpoint.
+      payload:
+        $ref: '#/components/schemas/SUPPORT_INFO (ATC)'
+    SET_CONFIG (CTA):
+      description: >-
+        Event is triggered when platform agent establishes connection with
+        controller. Controller sends entire configuration dump to platform
+        agent.
+      payload:
+        $ref: '#/components/schemas/SET_CONFIG'
+
+    UPDATE_CONFIG (CTA):
+      description: >-
+        Event is triggered when platform agent updates connection with
+        controller. Controller sends only diff configuration dump to platform
+        agent.
+      payload:
+        $ref: '#/components/schemas/SET_CONFIG'
   schemas:
-    AUTO_PING_REQ:
+    SET_CONFIG:
       type: object
+      required:
+        - id
+        - type
+        - data
       properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
         type:
           type: string
-          const: AUTO_PING
+          const: SET_CONFIG
         data:
-          type: array
-          description: Array of ips.
-          items:
-            type: string
-            description: Array of ip addresses agent should ping.
+          type: object
+          required:
+            - agent_id
+            - network
+          properties:
+            agent_id:
+              type: string
+            unat4:
+              type: array
+              description: Configure NFTABLES / EBPF
+              items:
+                type: object
+                oneOf:
+                  - $ref: '#/components/schemas/unat4_table_add'
+                  - $ref: '#/components/schemas/unat4_table_add'
+                  - $ref: '#/components/schemas/unat4_table_del'
+                  - $ref: '#/components/schemas/unat4_mapping_clear'
+                  - $ref: '#/components/schemas/unat4_mapping_get'
+    CONFIG_INFO (ATC):
+      type: object
+      description: TBD
       required:
-          - type
-          - data
+        - id
+        - executed_at
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
+        type:
+          type: string
+          const: CONFIG_INFO
+        data:
+          type: object
+          description: TBD
+          properties:
+            unat4:
+              type: array
+              description: Configure NFTABLES / EBPF
+              items:
+                type: object
+                oneOf:
+                  - $ref: '#/components/schemas/unat4_table_add'
+                  - $ref: '#/components/schemas/unat4_table_add'
+                  - $ref: '#/components/schemas/unat4_table_del'
+                  - $ref: '#/components/schemas/unat4_mapping_clear'
+                  - $ref: '#/components/schemas/unat4_mapping_get'
+            settings:
+              type: object
+              properties:
+                auto_ping:
+                  $ref: '#/components/schemas/set_auto_ping'
     AUTO_PING_RES:
       type: object
       properties:
@@ -113,30 +186,6 @@ components:
                 type: integer
               packet_loss:
                 type: number
-    NFTABLES:
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-        type:
-          type: string
-          const: NFTABLES
-        data:
-          type: array
-          description: Configure NFTABLES / EBPF
-          items:
-            type: object
-            oneOf:
-              - $ref: '#/components/schemas/unat4_table_add'
-              - $ref: '#/components/schemas/unat4_table_add'
-              - $ref: '#/components/schemas/unat4_table_del'
-              - $ref: '#/components/schemas/unat4_mapping_clear'
-              - $ref: '#/components/schemas/unat4_mapping_get'
-
     LOGGER:
       type: object
       required:
@@ -146,7 +195,7 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/msg_id'
-          default: "-"
+          default: '-'
         type:
           type: string
           const: LOGGER
@@ -160,7 +209,54 @@ components:
               type: string
             message:
               type: string
-
+    SUPPORT_INFO (CTA):
+      type: object
+      required:
+        - id
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        type:
+          type: string
+          const: GET_SUPPORT_INFO
+        data:
+          type: object
+    SUPPORT_INFO (ATC):
+      type: object
+      required:
+        - id
+        - executed_at
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
+        type:
+          type: string
+          const: SUPPORT_INFO
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/support_info'
+    set_auto_ping:
+      type: object
+      required:
+        - ips
+        - interval
+      properties:
+        hosts:
+          type: array
+          description: Array of ips.
+          items:
+            type: string
+            description: Array of ip addresses agent should ping.
+        interval:
+          $ref: '#/components/schemas/interval'
+          description: Interval in seconds to ping hosts.
     unat4_table_add:
       type: object
       required:
@@ -178,7 +274,6 @@ components:
             addr:
               $ref: '#/components/schemas/ip_addr'
       description: Unat4 table creation.
-
     unat4_table_del:
       type: object
       proprties:
@@ -187,7 +282,6 @@ components:
           const: unat4_table_del
         args:
           type: object
-
     unat4_mapping_clear:
       type: object
       required:
@@ -208,7 +302,6 @@ components:
             port:
               $ref: '#/components/schemas/port'
       description: Delete mapping
-
     unat4_mapping_get:
       type: object
       required:
@@ -229,7 +322,6 @@ components:
             port:
               $ref: '#/components/schemas/port'
       description: Get mapping info
-
     unat4_mapping_set:
       type: object
       required:
@@ -252,7 +344,6 @@ components:
             endpoints:
               $ref: '#/components/schemas/endpoints'
       description: Unat4 mapping set.
-
     endpoints:
       type: object
       required:
@@ -263,14 +354,30 @@ components:
           $ref: '#/components/schemas/ip_addr'
         port:
           $ref: '#/components/schemas/port'
-
-
+    support_info:
+      description: Status after creating interface
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
     msg_id:
       type: string
       description: Unique ID of message. (response should be sent with same id as request)
-
     ip_addr:
       type: string
-
     port:
       type: number
+    executed_at:
+      type: string
+      format: date-time
+    interval:
+      type: integer
+    action:
+      type: string
+      enum:
+        - SET
+        - DEL

@@ -53,8 +53,6 @@ channels:
           - $ref: '#/components/messages/GET_INIT_INFO (CTA)'
           - $ref: '#/components/messages/SET_CONFIG (CTA)'
           - $ref: '#/components/messages/UPDATE_CONFIG (CTA)'
-          - $ref: '#/components/messages/SET_AUTO_PING (CTA)'
-          - $ref: '#/components/messages/SET_PEER_CONF (CTA)'
           - $ref: '#/components/messages/GET_SUPPORT_INFO (CTA)'
     publish:
       description: Send messeges to the controller
@@ -71,24 +69,6 @@ channels:
           - $ref: '#/components/messages/SUPPORT_INFO (ATC)'
 components:
   messages:
-    SET_AUTO_PING (CTA):
-      description: >-
-        Controller sets the list of host to be pinged (ICMP) periodically at
-        configured interval (in seconds). The first response should be processed
-        ASAP.
-      payload:
-        $ref: '#/components/schemas/SET_AUTO_PING (CTA)'
-      examples:
-        - payload:
-            id: nEsBfD773UlafZnf
-            type: AUTO_PING
-            data:
-              ips:
-                - 23.95.220.138
-                - 94.237.29.266
-                - 173.104.147.220
-              interval: 60
-              response_limit: 5
     AUTO_PING (ATC):
       description: >-
         Response results count should be limited to `response_limit` best
@@ -316,70 +296,6 @@ components:
                   internal_ip: 10.69.0.147
                   public_key: J7Dt8IZ3arBUSkHWTJW5WUPf3cpoZRU+qSYVS+eqwAI=
                   port: 3334
-
-    SET_PEER_CONF (CTA):
-      description: >-
-        Controller sends platform agent configuration commands, which should be
-        executed in platform agent, i.e. to create interface, to add peer, to
-        delete interface, to delete peer. When adding interface, controller can
-        pick port, or agent can respond with assigned one.
-      payload:
-        $ref: '#/components/schemas/SET_PEER_CONF (CTA)'
-      examples:
-        - payload:
-            id: Asa05ML1102HSJVl
-            type: SET_PEER_CONF
-            data:
-                - action: SET
-                  index: 0
-                  public_key: c1/1GkBsq+MCDdiXFrfjLnXI+H7oGvDQs0kfn/gmFkI=
-                  private_ip: 10.69.88.21
-                  public_ip: 194.51.24.152
-                  port: 5443
-                  connection_id: 1025317
-                  connection_group_id: 75122
-                  services:
-                  - ip: 172.20.0.2/32
-                    name: Prometheus
-                    ports:
-                      udp:
-                      - 9090
-                      tcp:
-                      - 9090
-                - action: SET
-                  index: 0
-                  public_key: 2sw+YfjZUVQEPECtfqKtvaNvJBpC+ysQRHD/zw4Dcg0=
-                  private_ip: 10.69.100.23
-                  public_ip: 94.251.23.158
-                  port: 5443
-                  connection_id: 1025619
-                  connection_group_id: 75587
-                  services:
-                  - ip: 172.21.0.3/32
-                    name: MongoDB
-                    ports:
-                      tcp:
-                      - 27017
-                - action: DEL
-                  index: 1
-                  public_key: 0GiDp4uyu548ExsxCxV8MMDSToh49jYy8Xm9igM15n0=
-                  private_ip: 10.69.100.24
-
-        - payload:
-            id: Asa05ML1102HSJVl
-            type: SET_PEER_CONF (CTA)
-            data:
-              - fn: remove_peer
-                args:
-                  index: SYNTROPY_PUBLIC
-                  public_key: KaCq7nTViC9rhPc21ky92H7iTldGF76m3hrcSR4UdUc=
-                  allowed_ips:
-                    - 10.69.10.86/32
-              - fn: remove_peer
-                index: SYNTROPY_SDN1
-                public_key: AxB/JKQ9aPRgfEA5zI00jX4aZzfxz8LwTKrYaN0OkjI=
-                allowed_ips:
-                  - 10.69.10.86/32
     NETWORK_STATISTICS (ATC):
       description: >-
         Platform agent periodically sends wireguard configured interfaces peers
@@ -505,33 +421,22 @@ components:
     SET_AUTO_PING (CTA):
       type: object
       required:
-        - id
-        - type
-        - data
+        - ips
+        - interval
+        - response_limit
       properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-        type:
-          type: string
-          const: SET_AUTO_PING
-        data:
-          required:
-            - ips
-            - interval
-            - response_limit
-          properties:
-            ips:
-              type: array
-              description: Array of ips.
-              items:
-                type: string
-                description: Array of ip addresses agent should ping.
-            interval:
-              $ref: '#/components/schemas/interval'
-              description: Interval in seconds to ping hosts.
-            response_limit:
-              $ref: '#/components/schemas/response_limit'
-              description: Count of best results to send in response.
+        ips:
+          type: array
+          description: Array of ips.
+          items:
+            type: string
+            description: Array of ip addresses agent should ping.
+        interval:
+          $ref: '#/components/schemas/interval'
+          description: Interval in seconds to ping hosts.
+        response_limit:
+          $ref: '#/components/schemas/response_limit'
+          description: Count of best results to send in response.
     AUTO_PING (ATC):
       type: object
       required:
@@ -738,23 +643,6 @@ components:
               type: array
               items:
                 - $ref: '#/components/schemas/interface'
-    SET_PEER_CONF (CTA):
-      type: object
-      required:
-        - id
-        - type
-        - data
-      properties:
-        id:
-          $ref: '#/components/schemas/msg_id'
-        type:
-          type: string
-          const: SET_PEER_CONF
-        data:
-          type: array
-          description: List of wireguard configration commands
-          items:
-              $ref: '#/components/schemas/peer'
     NETWORK_STATISTICS (ATC):
       type: object
       required:
@@ -1219,21 +1107,6 @@ components:
                   $ref: '#/components/schemas/interface_status'
               ip:
                 type: string
-    sys_info_statuses:
-      description: Status after creating interface
-      properties:
-        key:
-          type: string
-          const: INTERFACES
-        value:
-          type: array
-          items:
-            type: object
-            properties:
-              errors:
-                type: array
-                items:
-                  $ref: '#/components/schemas/sys_info'
     support_info:
       description: Status after creating interface
       required:
