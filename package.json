@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/SyntropyNet/protocols#readme",
   "devDependencies": {
-    "@asyncapi/generator": "^1.8.9",
-    "@asyncapi/html-template": "^0.23.7",
+    "@asyncapi/generator": "^1.8.27",
+    "@asyncapi/html-template": "^0.24.4",
     "concurrently": "^6.2.1",
     "serve": "^12.0.1"
   },
