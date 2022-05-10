@@ -177,7 +177,7 @@ components:
           type: array
           description: Array of ips.
           items:
-            description: Array of ip addresses should ping.
+            description: An array of IP addresses should ping.
             type: object
             properties:
               ip:
@@ -296,7 +296,9 @@ components:
         port:
           $ref: '#/components/schemas/port'
         endpoints:
-          $ref: '#/components/schemas/endpoints'
+          type: array
+          items:
+            - $ref: '#/components/schemas/endpoints'
     endpoints:
       type: object
       required:
