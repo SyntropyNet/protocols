@@ -252,7 +252,7 @@ components:
         - ips
         - interval
       properties:
-        hosts:
+        ips:
           type: array
           description: Array of ips.
           items:
@@ -260,7 +260,7 @@ components:
             description: Array of ip addresses agent should ping.
         interval:
           $ref: '#/components/schemas/interval'
-          description: Interval in seconds to ping hosts.
+          description: Interval in seconds to ping ips.
     set_darp:
       type: object
       required:
