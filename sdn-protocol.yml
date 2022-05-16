@@ -116,11 +116,8 @@ components:
         data:
           type: object
           required:
-            - agent_id
             - network
           properties:
-            agent_id:
-              type: string
             unat4_table:
               $ref: '#/components/schemas/unat4_table'
             unat4_mapping:
