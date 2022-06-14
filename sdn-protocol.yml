@@ -55,6 +55,8 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/LOGGER'
+          - $ref: '#/components/messages/NETWORK_STATISTICS'
+
 
 
 components:
@@ -75,6 +77,38 @@ components:
       description: SDN agent sends nicely formatted log data to controller. This data is later redirected to sdn agents index for users to consume.
       payload:
         $ref: '#/components/schemas/LOGGER'
+
+    NETWORK_STATISTICS:
+      description: >-
+        SDN agent periodically sends endpoints bandwidth data. SDN agent sends data every 30 seconds.
+      payload:
+        $ref: '#/components/schemas/NETWORK_STATISTICS'
+      examples:
+        - payload:
+            id: '-'
+            type: NETWORK_STATISTICS
+            executed_at: '2022-06-14T10:16:12Z'
+            data:
+              - port: 4397
+                endpoints:
+                  - addr: 35.180.69.73
+                    port: 42791
+                    pkts_ok: 12
+                    bytes_ok: 1296
+                  - addr: 13.53.39.121
+                    port: 42696
+                    pkts_ok: 12
+                    bytes_ok: 1296
+              - port: 4444
+                endpoints:
+                  - addr: 65.180.69.71
+                    port: 44444
+                    pkts_ok: 123
+                    bytes_ok: 123
+                  - addr: 63.53.39.124
+                    port: 66666
+                    pkts_ok: 125
+                    bytes_ok: 1293
 
 
   schemas:
@@ -167,6 +201,51 @@ components:
               type: string
             message:
               type: string
+
+    NETWORK_STATISTICS:
+      type: object
+      required:
+        - id
+        - type
+        - data
+        - executed_at
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: '-'
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
+        type:
+          type: string
+          const: NETWORK_STATISTICS
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - addr
+              - endpoints
+            properties:
+              addr:
+                $ref: '#/components/schemas/ip_addr'
+              endpoints:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - addr
+                    - port
+                    - pkts_ok
+                    - bytes_ok
+                  properties:
+                    addr:
+                      $ref: '#/components/schemas/ip_addr'
+                    port:
+                      $ref: '#/components/schemas/port'
+                    bytes_ok:
+                      $ref: '#/components/schemas/bytes'
+                    pkts_ok:
+                      $ref: '#/components/schemas/packets'
 
     unat4_table_add:
       type: object
@@ -285,3 +364,11 @@ components:
     executed_at:
       type: string
       description: Datetime ISO8601 format
+
+    bytes:
+      type: integer
+      format: int64
+
+    packets:
+      type: integer
+      format: int64
