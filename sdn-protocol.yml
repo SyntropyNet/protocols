@@ -286,6 +286,8 @@ components:
         - addr
         - port
       properties:
+        connection_id:
+          $ref: '#/components/schemas/ip_addr'
         action:
           $ref: '#/components/schemas/action'
         addr:
@@ -319,6 +321,8 @@ components:
     msg_id:
       type: string
       description: Unique ID of message. (response should be sent with same id as request)
+    connection_id:
+      type: string
     ip_addr:
       type: string
     port:
