@@ -197,8 +197,9 @@ components:
                 - $ref: '#/components/schemas/unat4_mapping'
             settings:
               type: object
-              darp:
-                $ref: '#/components/schemas/set_darp'
+              properties:
+                darp:
+                  $ref: '#/components/schemas/set_darp'
     AUTO_PING (ATC):
       type: object
       properties:
