@@ -302,9 +302,15 @@ components:
             required:
               - addr
               - endpoints
+              - port
+              - connection_id
             properties:
               addr:
                 $ref: '#/components/schemas/ip_addr'
+              port:
+                $ref: '#/components/schemas/port'
+              connection_id:
+                $ref: '#/components/schemas/connection_id'
               endpoints:
                 type: array
                 items:
