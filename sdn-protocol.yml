@@ -59,10 +59,12 @@ channels:
       description: Send messeges to the controller
       message:
         oneOf:
-          - $ref: '#/components/messages/LOGGER'
+          - $ref: '#/components/messages/CONFIG_INFO (ATC)'
+          - $ref: '#/components/messages/NETWORK_STATISTICS (ATC)'
+          - $ref: '#/components/messages/LOGGER (ATC)'
 components:
   messages:
-    LOGGER:
+    LOGGER (ATC):
       description: >-
         SDN agent sends nicely formatted log data to controller. This data is
         later redirected to sdn agents index for users to consume.
@@ -92,14 +94,53 @@ components:
         agent.
       payload:
         $ref: '#/components/schemas/SET_CONFIG'
-
+      x-response:
+        $ref: '#/components/messages/CONFIG_INFO (ATC)'
     UPDATE_CONFIG (CTA):
       description: >-
         Event is triggered when platform agent updates connection with
         controller. Controller sends only diff configuration dump to platform
         agent.
+      x-response:
+        $ref: '#/components/messages/CONFIG_INFO (ATC)'
+    CONFIG_INFO (ATC):
+      summary: CONFIG_INFO (ATC) is a response to SET_CONFIG (CTA) message
+      description: >-
+        SDN agents sends this event to controller when it wants to update
+        configuration data, i.e. to change mappings ports or update darp multiaddresses.
       payload:
-        $ref: '#/components/schemas/SET_CONFIG'
+        $ref: '#/components/schemas/CONFIG_INFO (ATC)'
+    NETWORK_STATISTICS (ATC):
+      description: >-
+        SDN agent periodically sends endpoints bandwidth data. SDN agent sends data every 30 seconds.
+      payload:
+        $ref: '#/components/schemas/NETWORK_STATISTICS (ATC)'
+      examples:
+        - payload:
+            id: '-'
+            type: NETWORK_STATISTICS
+            executed_at: '2022-06-14T10:16:12Z'
+            data:
+              - port: 4397
+                endpoints:
+                  - addr: 35.180.69.73
+                    port: 42791
+                    pkts_ok: 12
+                    bytes_ok: 1296
+                  - addr: 13.53.39.121
+                    port: 42696
+                    pkts_ok: 12
+                    bytes_ok: 1296
+              - port: 4444
+                endpoints:
+                  - addr: 65.180.69.71
+                    port: 44444
+                    pkts_ok: 123
+                    bytes_ok: 123
+                  - addr: 63.53.39.124
+                    port: 66666
+                    pkts_ok: 125
+                    bytes_ok: 1293
   schemas:
     SET_CONFIG:
       type: object
@@ -133,7 +174,7 @@ components:
                   $ref: '#/components/schemas/set_darp'
     CONFIG_INFO (ATC):
       type: object
-      description: TBD
+      description: Need to send only if ports or bootstrap addresses updated compared to SET_CONFIG (CTA).
       required:
         - id
         - executed_at
@@ -149,22 +190,16 @@ components:
           const: CONFIG_INFO
         data:
           type: object
-          description: TBD
           properties:
-            unat4_table:
-              type: array
-              items:
-                - $ref: '#/components/schemas/unat4_table'
             unat4_mapping:
               type: array
               items:
                 - $ref: '#/components/schemas/unat4_mapping'
             settings:
               type: object
-              properties:
-                auto_ping:
-                  $ref: '#/components/schemas/set_auto_ping'
-    AUTO_PING_RES:
+              darp:
+                $ref: '#/components/schemas/set_darp'
+    AUTO_PING (ATC):
       type: object
       properties:
         type:
@@ -243,6 +278,50 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/support_info'
+    NETWORK_STATISTICS (ATC):
+      type: object
+      required:
+        - id
+        - type
+        - data
+        - executed_at
+      properties:
+        id:
+          $ref: '#/components/schemas/msg_id'
+          default: '-'
+        executed_at:
+          $ref: '#/components/schemas/executed_at'
+        type:
+          type: string
+          const: NETWORK_STATISTICS
+        data:
+          type: array
+          items:
+            type: object
+            required:
+              - addr
+              - endpoints
+            properties:
+              addr:
+                $ref: '#/components/schemas/ip_addr'
+              endpoints:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - addr
+                    - port
+                    - pkts_ok
+                    - bytes_ok
+                  properties:
+                    addr:
+                      $ref: '#/components/schemas/ip_addr'
+                    port:
+                      $ref: '#/components/schemas/port'
+                    bytes_ok:
+                      $ref: '#/components/schemas/bytes'
+                    pkts_ok:
+                      $ref: '#/components/schemas/packets'
     set_auto_ping:
       type: object
       required:
@@ -285,6 +364,7 @@ components:
         - action
         - addr
         - port
+        - connection_id
       properties:
         connection_id:
           $ref: '#/components/schemas/ip_addr'
@@ -330,6 +410,16 @@ components:
     executed_at:
       type: string
       format: date-time
+      description: Datetime ISO8601 format
+
+    bytes:
+      type: integer
+      format: int64
+
+    packets:
+      type: integer
+      format: int64
+
     interval:
       type: integer
     action:
@@ -337,6 +427,7 @@ components:
       enum:
         - SET
         - DEL
+
     severity:
       type: string
       enum:
