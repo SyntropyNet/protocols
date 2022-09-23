@@ -893,10 +893,6 @@ components:
           $ref: '#/components/schemas/public_key'
         port:
           $ref: '#/components/schemas/port'
-        peers:
-          type: array
-          items:
-            - $ref: '#/components/schemas/peer'
       description: Wireguard interface info.
     peer:
       type: object
@@ -927,10 +923,6 @@ components:
           $ref: '#/components/schemas/connection_id'
         connection_group_id:
           $ref: '#/components/schemas/connection_group_id'
-        services:
-          type: array
-          items:
-            - $ref: '#/components/schemas/service'
       description: Peer fields.
     service:
       type: object
