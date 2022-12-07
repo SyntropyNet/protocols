@@ -754,11 +754,19 @@ components:
           items:
             type: object
             required:
+              - prev_connection_id
               - connection_id
+              - connection_group_id
               - timestamp
             properties:
+              prev_connection_id:
+                $ref: '#/components/schemas/connection_id'
               connection_id:
                 $ref: '#/components/schemas/connection_id'
+              connection_group_id:
+                $ref: '#/components/schemas/connection_group_id'
+              route_change_reason:
+                type: string
               timestamp:
                 type: string
     LOGGER:
